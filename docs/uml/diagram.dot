@@ -1,0 +1,62 @@
+digraph G {
+    rankdir = LR;
+    nodesep = 0.10;
+    ranksep = 0.05;
+    graph [fontname = "helvetica"];
+     node [fontname = "helvetica"];
+     edge [fontname = "helvetica"];
+    error -> split [label = "(Ws, Ps, Es)"];
+
+
+    split -> ocr_test2 [label = "Ws"];
+    //split -> ocr_test2 [label= "Ws"];
+    split -> ocr_train2 [label= "(Ws, Ts)"];
+
+    {
+        rank = same;
+        ocr_test0 [label="U(t-1)", style="filled", color="brown1"];
+        ocr_train0 [label = "+"];
+        ocr_train_old [label = "I(t-1)", style="filled", color="chocolate2"];
+    }
+
+    ocr_train_new [label = "I'(t-1)", style="filled", color="chartreuse3"];
+    subgraph cluster_error {
+        {
+            rank = "same";
+            error [label ="Error\nModule", shape="rectangle"]; 
+            dict [label = "Dictionary/\nLanguage Model", shape = "cylinder"];
+            //error -> dict [style = "dashed", dir="back"];
+            dict -> error [style = "dashed"];
+        }
+    }
+
+
+
+    ocr_train_old -> ocr_train0 ;
+    ocr_train_new -> ocr_train0 ;
+
+    ocr_test0 -> ocr_test [label = "Ws"];
+    ocr_train0 -> ocr_train [label = "I(t) :: (Ws, Ts)"];
+    subgraph cluster_ocr {
+        label = "OCR";
+        color="orange";
+        {
+            rank=same;
+            ocr_train [label = "Train", shape="rectangle"];
+            ocr_test [label = "Test", shape="rectangle"];
+            model [label = "Model", shape="cylinder"];
+        }
+        ocr_train -> model [style = "dashed"];
+        model -> ocr_test [style = "dashed"];
+    }
+
+    {
+        rank = same;
+        ocr_test2 [label = "U(t)", style="filled", color="brown1"];
+        ocr_train2 [label="I'(t)", style="filled", color="chartreuse3"];
+    }
+    split [label ="Split Module", shape="rectangle"]; 
+
+
+    ocr_test -> error [label="(Ws, Ps)"];
+}

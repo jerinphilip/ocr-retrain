@@ -1,0 +1,20 @@
+digraph G {
+    rankdir = "LR";
+    subgraph cluster_human {
+        label = "Human Interaction";
+        {
+            rank = "same";
+            optimal_split;
+            human;
+        }
+        optimal_split -> human;
+    }
+
+    human -> ocr_train_human;
+    optimal_split -> ocr_test_human;
+    {
+        rank = same;
+        ocr_test_human [label = "U(t)", style="filled", color="brown1"];
+        ocr_train_human [label="I'(t)", style="filled", color="chartreuse3"];
+    }
+}
