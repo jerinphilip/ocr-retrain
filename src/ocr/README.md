@@ -12,7 +12,7 @@ class OCR_Module:
     # ([sequence], [target]) -> [errors]
     def train(self, sequences, targets):
         # Train function
-         errors
+        # returns errors
 
     # sequence -> prediction :: String
     def test(self, sequence):
