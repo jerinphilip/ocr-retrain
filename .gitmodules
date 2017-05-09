@@ -1,0 +1,3 @@
+[submodule "src/ocr/GravesOCR"]
+	path = src/ocr/GravesOCR
+	url = https://github.com/jerinphilip/ocr
