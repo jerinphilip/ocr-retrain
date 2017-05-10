@@ -17,9 +17,12 @@ class OCR_Module:
     # sequence -> prediction :: String
     def test(self, sequence):
         # Test.
+
+    def export(self):
+        # Export model
     
 ```
 
-# ToDo
 
-Write a swig interface to reuse `nnl_ndim`.
+
+# Graves OCR
