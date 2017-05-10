@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, '/home/deepayan/github/ocr-retrain/src/aux/') #specify the path where tokenizer file is present
 
 from tokenizer import tokenize
-
+#something
 # the below code iterates over each book present in specified path and writes all the unique words in a text file.
 # the text file can later be loaded as a list
 
