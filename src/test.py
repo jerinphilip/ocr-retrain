@@ -24,6 +24,8 @@ ocr = GravesOCR(
 fname = sys.argv[1]
 img = cv2.imread(fname)
 
+D = Dictionary(lang="malayalam")
+
 with open(fname + '.lines.txt') as fp:
 #with open(fname + '.words.txt') as fp:
     bboxes = map(lambda x: list(map(int, x.strip().split())), fp)
@@ -50,7 +52,7 @@ with open(fname + '.lines.txt') as fp:
         #print(vector)
         s = ocr.recognize(vector)
         for w in tokenize(s):
-            print(w)
+            print(D.error(w), w)
 
 
         #topleft = (min(x2, x), min(y2, y))
