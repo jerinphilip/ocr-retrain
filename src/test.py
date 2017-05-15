@@ -52,7 +52,10 @@ with open(fname + '.lines.txt') as fp:
         #print(vector)
         s = ocr.recognize(vector)
         for w in tokenize(s):
-            print(D.error(w), w)
+            if D.error(w) > 0:
+                print(D.error(w), w,':', ','.join(D.suggest(w)))
+            else:
+                print(D.error(w), w)
 
 
         #topleft = (min(x2, x), min(y2, y))

@@ -1,5 +1,6 @@
 from marisa_trie import Trie
 import os
+from Levenshtein import distance
 
 class Dictionary:
     def __init__(self, *args, **kwargs):
@@ -21,4 +22,12 @@ class Dictionary:
 
     def error(self, word):
         return (1-int(word in self.trie))
+
+    def suggest(self, word):
+        rule = lambda x: distance(x, word) <= 3
+        suggestions = list(filter(rule, self.trie))
+        suggestions = sorted(suggestions, key=lambda x: distance(x, word))
+        n = min(5, len(suggestions))
+        return suggestions[:n]
+
 
