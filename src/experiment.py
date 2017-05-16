@@ -20,10 +20,25 @@ ocr = GravesOCR(
 
 D = Dictionary(lang="malayalam")
 
+real_word_error = 0
+suggestion_matrix = {}
 for image, truth in zip(images, truths):
     predicted = ocr.recognize(image)
     print("[\t%s\n\t %s\n]"%(predicted, truth))
+    if D.error(predicted) > 0:
+        suggestions = D.suggest(predicted)
+        index = suggestions.index(truth)
+        if index not in suggestion_matrix:
+            suggestion_matrix[index] = 0
+        suggestion_matrix[index] += 1
 
+    else:
+        if predicted != truth:
+            real_word_error += 1
+
+
+pprint(suggestion_matrix)
+pprint(real_word_error)
 # Feedforward into OCR, Get outputs.  
 # Run postprocessing module.
 # Report Errors. Some form of visualization

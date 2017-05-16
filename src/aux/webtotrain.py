@@ -117,11 +117,12 @@ def read_book(book_dir_path):
     obtainxml = lambda f: book_dir_path + f + '.xml'
     filenames = map(obtainxml, ['line', 'word', 'text'])
     lines, words, text = list(map(parse_ocr_xml, filenames))
-    #ud = group(text, words)
-    #pagewise = images_and_truths(ud, word_mapping_f)
-    ud = group(text, lines)
+    ud = group(text, words)
     ud["prefix"] = book_dir_path
-    pagewise = images_and_truths(ud, line_mapping_f)
+    pagewise = images_and_truths(ud, word_mapping_f)
+    #ud = group(text, lines)
+    #ud["prefix"] = book_dir_path
+    #pagewise = images_and_truths(ud, line_mapping_f)
 
     images, truths = [], []
 
