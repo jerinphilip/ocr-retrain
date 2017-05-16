@@ -11,8 +11,8 @@ from aux import webtotrain
 # Obtain (sequences, targets)
 
 
-#book_dir = '/home/jerin/honours-super/data/0002/'
-book_dir = '/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0002/'
+
+book_dir='/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0002/'
 images, truths = webtotrain.read_book(book_dir)
 
 ocr = GravesOCR(
