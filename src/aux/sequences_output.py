@@ -9,16 +9,11 @@ path = sys.argv[1]
 
 def parse_cordinates(PageNo,Bookcode):
     full_path = os.path.join(path,os.path.join(Bookcode,'line.xml'))     #takes the line.xml file of a certain book and parses all the 
-                                                                        #coordinates for the particular page. Returns all the line-coordinates in 
-                                                                        # an ascending order.
     xmldoc = minidom.parse(full_path)
-
     rows = xmldoc.getElementsByTagName('row')
     a=[]
     for row in rows:
-
         if (row.getElementsByTagName('field')[1].firstChild.data == str(PageNo)):
-
             LineNo = row.getElementsByTagName('field')[3].firstChild.data
             x1 = row.getElementsByTagName('field')[5].firstChild.data
             x2 = row.getElementsByTagName('field')[6].firstChild.data
@@ -111,15 +106,11 @@ def feature_extract(Image,bbox_info,line_info):
         print (e)
 
 
-
-
 def get_data():                                  
     seqences=[]
     targets = []
     book_list = [x[0] for x in os.walk(path)]
-
     for each_dir in book_list[1:]:                       #picks one book at a time 
-
         full_path = os.path.join(each_dir, 'text.xml')   # looks for text.xml in the book directory
 
         if os.path.exists(full_path):

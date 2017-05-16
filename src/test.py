@@ -4,6 +4,7 @@ from error_module import Dictionary
 import cv2
 import sys
 from aux.tokenizer import tokenize
+from pprint import pprint
 
 def convert(pyocr_output):
     codepoint = pyocr_output[1:]
@@ -20,6 +21,8 @@ def display_img(inputs):
 ocr = GravesOCR(
         "models/Malayalam.xml",  # Weights file
         "lookups/Malayalam.txt")
+
+pprint(ocr.table)
 
 fname = sys.argv[1]
 img = cv2.imread(fname)

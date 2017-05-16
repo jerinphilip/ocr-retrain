@@ -1,5 +1,4 @@
 from lxml import etree
-from pprint import pprint
 import cv2
 
 """
@@ -59,9 +58,9 @@ def extract_atoms(image_location, atoms):
         height, width = subImg.shape
         #print(subImg.shape)
         ratio = 32/height
-        cv2.resize(subImg, None, fx=ratio, fy=ratio, 
+        resized = cv2.resize(subImg, None, fx=ratio, fy=ratio, 
                 interpolation = cv2.INTER_CUBIC)
-        return subImg
+        return resized
 
     atomImages = list(map(extract_atom_image, atoms))
     return atomImages
@@ -79,8 +78,6 @@ def group(text_data, atoms):
             udict["page"][pno]["atoms"] = []
     for atom in atoms:
         pno = int(atom["PageNo"])
-        #print(pno, udict.keys())
-        #assert(pno in udict)
         udict["page"][pno]["atoms"].append(atom)
 
     # Return ultimate dict
@@ -88,6 +85,7 @@ def group(text_data, atoms):
 
 def images_and_truths(udict, mapping_f):
     result = []
+    prefix = udict["prefix"]
     for pno in udict["page"]:
         extract_required = lambda x: udict["page"][pno][x]
         required_keys = ['Text', 'ImageLoc', 'atoms']
@@ -96,7 +94,7 @@ def images_and_truths(udict, mapping_f):
         # Order atoms by Key
         atom_truths, atoms = mapping_f(text, atoms)
         atom_images = extract_atoms(prefix+imgloc, atoms)
-        print(len(atom_images),  len(atom_truths))
+        #print(len(atom_images),  len(atom_truths))
         result.append((atom_images, atom_truths))
     return result
 
@@ -108,27 +106,27 @@ def line_mapping_f(text, atoms):
 def word_mapping_f(text, atoms):
     lines = list(filter(lambda x: x, text.split('\n')))
     words = list(map(lambda x: x.split(), lines))
-    owords, oatoms = [], []
+    owords = []
     for atom in atoms:
         i, j = list(map(lambda x: int(atom[x]), ["LineNo", "SerialNo"]))
         owords.append(words[i-1][j-1])
-        oatoms.append(atom)
     return (owords, atoms)
 
 
-if __name__ == '__main__':
-    import sys
-    prefix = sys.argv[1]
-    files = map(lambda f: prefix + f + '.xml', ['line', 'word', 'text'])
-    lines, words, text = list(map(parse_ocr_xml, files))
-    ud = group(text, lines)
-    result = images_and_truths(ud, line_mapping_f)
+def read_book(book_dir_path):
+    obtainxml = lambda f: book_dir_path + f + '.xml'
+    filenames = map(obtainxml, ['line', 'word', 'text'])
+    lines, words, text = list(map(parse_ocr_xml, filenames))
     #ud = group(text, words)
-    #result = images_and_truths(ud, word_mapping_f)
-    for pairs in result:
-        images, truths = pairs
-        for image, truth in zip(images, truths):
-            print("Truth:", truth)
-            cv2.imshow("window", image)
-            cv2.waitKey(0)
-    print(result)
+    #pagewise = images_and_truths(ud, word_mapping_f)
+    ud = group(text, lines)
+    ud["prefix"] = book_dir_path
+    pagewise = images_and_truths(ud, line_mapping_f)
+
+    images, truths = [], []
+
+    for image_ls, truth_ls in pagewise:
+        images.extend(image_ls)
+        truths.extend(truth_ls)
+
+    return (images, truths)

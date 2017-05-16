@@ -5,6 +5,14 @@ import cv2
 class GravesOCR:
     def __init__(self, weights_f, lookup_f):
         self.net = pyocr.NetAPI(weights_f, lookup_f)
+        # Load lookup table.
+        self.table = {}
+        with open(lookup_f) as lf:
+            values = list(map(
+                lambda x: self.stringToUnicode(x.strip()),
+                lf))
+            values = [None] + values
+            self.table = dict(zip(values, range(len(values))))
 
     def asType(self, interfaceType, sequence):
         fv = interfaceType(len(sequence))
@@ -29,14 +37,22 @@ class GravesOCR:
     def export(self):
         return self.net.exportModel()
 
-    def convert(self, ocr_output):
+    def stringToUnicode(self, ocr_output):
         codepoint = ocr_output[1:]
         codepoint_value = int(codepoint, 16)
         return chr(codepoint_value)
 
-    def recognize(self, sequence):
+    def unicodeToClasses(self, string):
+        return list(map(lambda x: self.table[x], string))
+
+    def cvImgToGraves(self, img):
+        vector = list(map(float, img.T.ravel()))
+        return vector
+    
+    def recognize(self, image):
+        sequence = self.cvImgToGraves(image)
         cps = self.test(sequence)
-        chars = list(map(lambda x: self.convert(x), cps))
+        chars = list(map(lambda x: self.stringToUnicode(x), cps))
         return ''.join(chars)
 
 
