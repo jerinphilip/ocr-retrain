@@ -11,7 +11,8 @@ from aux import webtotrain
 # Obtain (sequences, targets)
 
 
-book_dir = '/home/jerin/honours-super/data/0002/'
+#book_dir = '/home/jerin/honours-super/data/0002/'
+book_dir = '/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0002/'
 images, truths = webtotrain.read_book(book_dir)
 
 ocr = GravesOCR(
@@ -20,7 +21,7 @@ ocr = GravesOCR(
 
 D = Dictionary(lang="malayalam")
 real_word_error = 0
-predicted_correct = 
+predicted_correct =  0
 suggestion_matrix = {}
 suggestion_matrix["not_found"] = 0
 for image, truth in zip(images, truths):
@@ -37,8 +38,11 @@ for image, truth in zip(images, truths):
             suggestion_matrix["not_found"] += 1
 
     else:
+        print("[\t%s\n\t%s\n]"%(predicted, truth))
         if predicted != truth:
             real_word_error += 1
+        else:
+            predicted_correct += 1
 
 
 pprint(suggestion_matrix)
