@@ -19,18 +19,22 @@ ocr = GravesOCR(
         "lookups/Malayalam.txt")
 
 D = Dictionary(lang="malayalam")
-
 real_word_error = 0
+predicted_correct = 
 suggestion_matrix = {}
+suggestion_matrix["not_found"] = 0
 for image, truth in zip(images, truths):
     predicted = ocr.recognize(image)
-    print("[\t%s\n\t %s\n]"%(predicted, truth))
     if D.error(predicted) > 0:
         suggestions = D.suggest(predicted)
-        index = suggestions.index(truth)
-        if index not in suggestion_matrix:
-            suggestion_matrix[index] = 0
-        suggestion_matrix[index] += 1
+        print("[\t%s: [%s]\n\t%s\n]"%(predicted, ','.join(suggestions), truth))
+        try:
+            index = suggestions.index(truth)
+            if index not in suggestion_matrix:
+                suggestion_matrix[index] = 0
+            suggestion_matrix[index] += 1
+        except ValueError:
+            suggestion_matrix["not_found"] += 1
 
     else:
         if predicted != truth:
