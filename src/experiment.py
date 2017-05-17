@@ -32,11 +32,12 @@ counter = 0
 total = len(images)
 for image, truth in zip(images, truths):
     counter = counter + 1
-    print("%d/%d"%(counter, total))
+    if counter%1000 == 0:
+        print("%d/%d"%(counter, total))
     predicted = ocr.recognize(image)
     if D.error(predicted) > 0:
         suggestions = D.suggest(predicted)
-        print("[\t%s: [%s]\n\t%s\n]"%(predicted, ','.join(suggestions), truth), file=suggest_log_file)
+        print("[\t%s: [%s]\n\t%s\n]"%(predicted, ','.join(suggestions), truth), file=suggest_log_file, flush=True)
         try:
             index = suggestions.index(truth)
             if index not in suggestion_matrix:
@@ -46,7 +47,7 @@ for image, truth in zip(images, truths):
             suggestion_matrix["not_found"] += 1
 
     else:
-        print("[\t%s\n\t%s\n]"%(predicted, truth), file=correct_log_file)
+        print("[\t%s\n\t%s\n]"%(predicted, truth), file=correct_log_file, flush=True)
         if predicted != truth:
             real_word_error += 1
         else:
@@ -54,7 +55,8 @@ for image, truth in zip(images, truths):
 
 
 pprint(suggestion_matrix)
-pprint(real_word_error)
+pprint("Real word error:", real_word_error)
+pprint("Predicted correct:", predicted_correct)
 # Feedforward into OCR, Get outputs.  
 # Run postprocessing module.
 # Report Errors. Some form of visualization
