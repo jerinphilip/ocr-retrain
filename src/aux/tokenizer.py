@@ -1,4 +1,3 @@
-from aux.functional import compose
 from operator import add
 import re
 
