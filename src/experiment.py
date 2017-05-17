@@ -19,16 +19,24 @@ ocr = GravesOCR(
         "models/Malayalam.xml",  # Weights file
         "lookups/Malayalam.txt")
 
+
+suggest_log_file = open("suggessions.log", "w+")
+correct_log_file = open("correct.log", "w+")
+
 D = Dictionary(lang="malayalam")
 real_word_error = 0
 predicted_correct =  0
 suggestion_matrix = {}
 suggestion_matrix["not_found"] = 0
+counter = 0
+total = len(images)
 for image, truth in zip(images, truths):
+    counter = counter + 1
+    print("%d/%d"%(counter, total))
     predicted = ocr.recognize(image)
     if D.error(predicted) > 0:
         suggestions = D.suggest(predicted)
-        print("[\t%s: [%s]\n\t%s\n]"%(predicted, ','.join(suggestions), truth))
+        print("[\t%s: [%s]\n\t%s\n]"%(predicted, ','.join(suggestions), truth), file=suggest_log_file)
         try:
             index = suggestions.index(truth)
             if index not in suggestion_matrix:
@@ -38,7 +46,7 @@ for image, truth in zip(images, truths):
             suggestion_matrix["not_found"] += 1
 
     else:
-        print("[\t%s\n\t%s\n]"%(predicted, truth))
+        print("[\t%s\n\t%s\n]"%(predicted, truth), file=correct_log_file)
         if predicted != truth:
             real_word_error += 1
         else:
