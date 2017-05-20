@@ -6,21 +6,14 @@ class Dictionary:
     def __init__(self, *args, **kwargs):
         self.trie = Trie()
         path = os.path.dirname(os.path.realpath(__file__)) + "/"
-        if 'lang' in kwargs:
-            lang = kwargs['lang']
-            savefile = path + lang + '.save'
-            keysfile = path + lang + '.words'
-            if os.path.exists(savefile):
-                self.trie.load(savefile)
-            elif os.path.exists(keysfile):
-                with open(keysfile) as fp:
-                    keys = fp.read().splitlines()
-                    self.trie = Trie(keys)
-            else:
-                raise FileNotFoundError(path)
-            self.preprocess(lang)
+        if 'save' in kwargs:
+            self.trie.load(kwargs['save'])
         else:
-            raise KeyError("lang not set.")
+            with open(kwargs['words']) as fp:
+                keys = fp.read().splitlines()
+                self.trie = Trie(keys)
+
+        self.preprocess(kwargs['alphabet'])
 
 
     def generate_inverse_map(self):
@@ -35,27 +28,20 @@ class Dictionary:
         print(len(self.inv_map.keys()), count)
 
 
-    def preprocess(self,lang):
-        self.generate_inverse_map()
-        path = os.path.dirname(os.path.realpath(__file__)) + "/"
-        fname = path + lang +'.alphabet'
-        if os.path.exists(fname):
-            self.alphabet = open(fname).read()
-        else:
-            raise FileNotFoundError(path+fname)
-
+    def preprocess(self, alphabet_file):
+        self.alphabet = open(alphabet).read()
 
     def error(self, word):
         return (1-int(word in self.trie))
 
-    def old_suggest(self, word):
+    def suggest_v0(self, word):
         rule = lambda x: distance(x, word) <= 3
         suggestions = list(filter(rule, self.trie))
         suggestions = sorted(suggestions, key=lambda x: distance(x, word))
         n = min(5, len(suggestions))
         return suggestions[:n]
 
-    def old_suggest_v2(self, word):
+    def suggest_v1(self, word):
         intrie = lambda x: x in self.trie
         #candidates = list(self.edits1(word) or self.edits2(word))
         cand1 = set(filter(intrie, self.edits1(word)))
@@ -69,7 +55,7 @@ class Dictionary:
         n = min(5, len(suggestions))
         return suggestions[:n]
 
-    def suggest(self, word):
+    def suggest_v3(self, word):
         rep_word = frozenset(list(word))
         intrie = lambda x: x in self.trie
         candidates = []
@@ -82,6 +68,8 @@ class Dictionary:
         print(len(candidates))
         return candidates[:n]
 
+    def suggest(self, word):
+        return self.suggest_v1(word)
 
     def edits1(self, word):
         "All edits that are one edit away from `word`."

@@ -17,8 +17,8 @@ book_dir='/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0002/'
 images, truths = webtotrain.read_book(book_dir)
 
 ocr = GravesOCR(
-        "models/Malayalam.xml",  # Weights file
-        "lookups/Malayalam.txt")
+        "parameters/models/Malayalam.xml",  # Weights file
+        "parameters/lookups/Malayalam.txt")
 
 
 suggest_log_file = open("suggessions.log", "w+")
