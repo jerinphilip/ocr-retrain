@@ -5,6 +5,7 @@ from Levenshtein import distance
 class Dictionary:
     def __init__(self, *args, **kwargs):
         self.trie = Trie()
+        self.secondary_trie = Trie()
         path = os.path.dirname(os.path.realpath(__file__)) + "/"
         if 'save' in kwargs:
             self.trie.load(kwargs['save'])
@@ -15,6 +16,8 @@ class Dictionary:
 
         self.preprocess(kwargs['alphabet'])
 
+    def enhance_vocabulary(self, words):
+        self.secondary_trie = Trie(words)
 
     def generate_inverse_map(self):
         self.inv_map = {}
@@ -29,10 +32,10 @@ class Dictionary:
 
 
     def preprocess(self, alphabet_file):
-        self.alphabet = open(alphabet).read()
+        self.alphabet = open(alphabet_file).read()
 
     def error(self, word):
-        return (1-int(word in self.trie))
+        return (1-int(word in self.trie or word in self.secondary_trie))
 
     def suggest_v0(self, word):
         rule = lambda x: distance(x, word) <= 3
@@ -42,20 +45,20 @@ class Dictionary:
         return suggestions[:n]
 
     def suggest_v1(self, word):
-        intrie = lambda x: x in self.trie
-        #candidates = list(self.edits1(word) or self.edits2(word))
-        cand1 = set(filter(intrie, self.edits1(word)))
-        print("Edits1: ",len(cand1))
-        cand2 = set(filter(intrie, self.edits2(word)))
-        print("Edits2: ", len(cand2))
-        #in_dictionary = list(filter(lambda x: x in self.trie, candidates))
-        in_dictionary = list(cand1 or cand2)
-        print(len(in_dictionary), flush=True)
+        intrie = lambda x: x in self.trie or x in self.secondary_trie
+        candidates = list(self.edits1(word) or self.edits2(word))
+        #cand1 = set(filter(intrie, self.edits1(word)))
+        #print("Edits1: ",len(cand1))
+        #cand2 = set(filter(intrie, self.edits2(word)))
+        #print("Edits2: ", len(cand2))
+        in_dictionary = list(filter(intrie, candidates))
+        #in_dictionary = list(cand1 or cand2)
+        #print(len(in_dictionary), flush=True)
         suggestions = sorted(in_dictionary, key=lambda x: distance(x, word))
         n = min(5, len(suggestions))
         return suggestions[:n]
 
-    def suggest_v3(self, word):
+    def suggest_v2(self, word):
         rep_word = frozenset(list(word))
         intrie = lambda x: x in self.trie
         candidates = []

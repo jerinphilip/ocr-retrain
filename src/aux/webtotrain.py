@@ -123,11 +123,5 @@ def read_book(book_dir_path):
     #ud = group(text, lines)
     #ud["prefix"] = book_dir_path
     #pagewise = images_and_truths(ud, line_mapping_f)
+    return pagewise
 
-    images, truths = [], []
-
-    for image_ls, truth_ls in pagewise:
-        images.extend(image_ls)
-        truths.extend(truth_ls)
-
-    return (images, truths)
