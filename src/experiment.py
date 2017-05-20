@@ -6,6 +6,7 @@ import sys
 from aux.tokenizer import tokenize
 from aux import webtotrain
 
+from pprint import pprint
 # Load preprocessing module
 # Obtain (images, words)
 # Obtain (sequences, targets)
@@ -34,6 +35,11 @@ for image, truth in zip(images, truths):
     counter = counter + 1
     if counter%1000 == 0:
         print("%d/%d"%(counter, total))
+        print("Suggestion Matrix:\n")
+        pprint(suggestion_matrix)
+        print("Real word error:", real_word_error)
+        print("Predicted correct:", predicted_correct)
+        print("----\n", flush=True)
     predicted = ocr.recognize(image)
     if D.error(predicted) > 0:
         suggestions = D.suggest(predicted)
@@ -53,10 +59,6 @@ for image, truth in zip(images, truths):
         else:
             predicted_correct += 1
 
-
-pprint(suggestion_matrix)
-pprint("Real word error:", real_word_error)
-pprint("Predicted correct:", predicted_correct)
 # Feedforward into OCR, Get outputs.  
 # Run postprocessing module.
 # Report Errors. Some form of visualization
