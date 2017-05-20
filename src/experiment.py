@@ -21,10 +21,17 @@ ocr = GravesOCR(
         "parameters/lookups/Malayalam.txt")
 
 
-suggest_log_file = open("suggessions.log", "w+")
-correct_log_file = open("correct.log", "w+")
+suggest_log_file = open("output/suggessions.log", "w+")
+correct_log_file = open("output/correct.log", "w+")
 
-D = Dictionary(lang="malayalam")
+
+error_path = 'parameters/error/Malayalam/'
+kwargs = {}
+for key in ['alphabet', 'save', 'words']:
+    kwargs[key] = error_path + key
+
+
+D = Dictionary(**kwargs)
 real_word_error = 0
 predicted_correct =  0
 suggestion_matrix = {}
