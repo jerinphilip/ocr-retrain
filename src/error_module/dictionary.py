@@ -10,7 +10,7 @@ class Dictionary:
         if 'save' in kwargs:
             self.trie.load(kwargs['save'])
         else:
-            with open(kwargs['words']) as fp:
+            with open(kwargs['words'], encoding='utf-8') as fp:
                 keys = fp.read().splitlines()
                 self.trie = Trie(keys)
 
@@ -32,7 +32,7 @@ class Dictionary:
 
 
     def preprocess(self, alphabet_file):
-        self.alphabet = open(alphabet_file).read()
+        self.alphabet = open(alphabet_file, encoding='utf-8').read()
 
     def error(self, word):
         return (1-int(word in self.trie or word in self.secondary_trie))

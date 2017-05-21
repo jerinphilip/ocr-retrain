@@ -20,7 +20,7 @@ function provided below.
 
 # Parse line.xml file.
 def parse_ocr_xml(xml_file):
-    with open(xml_file) as f:
+    with open(xml_file, encoding='utf-8') as f:
         print("Read", xml_file)
         root = etree.parse(f)
         rows = root.xpath("row")
@@ -57,6 +57,7 @@ def extract_atoms(image_location, atoms):
         # Truncate to height 32
         height, width = subImg.shape
         #print(subImg.shape)
+        # TODO Take care of zero height
         ratio = 32/height
         resized = cv2.resize(subImg, None, fx=ratio, fy=ratio, 
                 interpolation = cv2.INTER_CUBIC)
@@ -100,8 +101,11 @@ def images_and_truths(udict, mapping_f):
 
 def line_mapping_f(text, atoms):
     lines = list(filter(lambda x: x, text.split('\n')))
-    atoms = sorted(atoms, key=lambda x: x["LineNo"])
-    return (lines, atoms)
+    olines = []
+    for atom in atoms:
+        i = int(atom["LineNo"])
+        olines.append(lines[i])
+    return (olines, atoms)
 
 def word_mapping_f(text, atoms):
     lines = list(filter(lambda x: x, text.split('\n')))

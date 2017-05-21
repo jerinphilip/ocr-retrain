@@ -71,8 +71,6 @@ def stats(ocr, em, book_path):
 
     return stat_d
 
-book_dir='/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0002/'
-#images, truths = webtotrain.read_book(book_dir)
 
 ocr = GravesOCR(
         "parameters/models/Malayalam2.xml",  # Weights file
@@ -87,48 +85,11 @@ for key in ['alphabet', 'save', 'words']:
 
 
 D = Dictionary(**kwargs)
+
+book_dir='/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/'+sys.argv[1]+'/'
+#images, truths = webtotrain.read_book(book_dir)
+print(sys.argv[1])
 sd = stats(ocr, D, book_dir)
 pprint(sd)
 exit()
-
-real_word_error = 0
-predicted_correct =  0
-suggestion_matrix = {}
-suggestion_matrix["not_found"] = 0
-counter = 0
-total = len(images)
-
-
-
-for image, truth in zip(images, truths):
-    counter = counter + 1
-    predicted = ocr.recognize(image)
-    if D.error(predicted) > 0:
-        suggestions = D.suggest(predicted)
-        #print("[\t%s: [%s]\n\t%s\n]"%(predicted, ','.join(suggestions), truth), file=suggest_log_file, flush=True)
-        try:
-            index = suggestions.index(truth)
-            if index not in suggestion_matrix:
-                suggestion_matrix[index] = 0
-            suggestion_matrix[index] += 1
-        except ValueError:
-            suggestion_matrix["not_found"] += 1
-
-    else:
-        #print("[\t%s\n\t%s\n]"%(predicted, truth), file=correct_log_file, flush=True)
-        if predicted != truth:
-            real_word_error += 1
-        else:
-            predicted_correct += 1
-    if counter%1000 == 0 or counter == total: 
-        print("%d/%d"%(counter, total))
-        print("Suggestion Matrix:\n")
-        pprint(suggestion_matrix)
-        print("Real word error:", real_word_error)
-        print("Predicted correct:", predicted_correct)
-        print("----\n", flush=True)
-
-# Feedforward into OCR, Get outputs.  
-# Run postprocessing module.
-# Report Errors. Some form of visualization
 
