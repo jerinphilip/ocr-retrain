@@ -20,7 +20,7 @@ def stats(ocr, em, book_path):
         images.extend(imgs)
         truths.extend(ts)
 
-    em.enhance_vocabulary(truths)
+    #em.enhance_vocabulary(truths)
     print("Recognizing..", flush=True)
     predictions = [ocr.recognize(image) for image in images]
     print("Computing Errors", flush=True)

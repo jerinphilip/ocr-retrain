@@ -1,5 +1,6 @@
 from lxml import etree
 import cv2
+import numpy as np
 
 """
 IIIT OCR Web System follows the following xml tree structure.
@@ -55,6 +56,10 @@ def extract_atoms(image_location, atoms):
         x, X, y, Y = trimRect(atom)
         subImg = thresholded[y:Y, x:X]
         # Truncate to height 32
+        height, width = subImg.shape
+        if height is 0 or width is 0:
+            subImg = np.zeros((32, 32))
+
         height, width = subImg.shape
         #print(subImg.shape)
         # TODO Take care of zero height
