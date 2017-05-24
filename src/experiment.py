@@ -30,62 +30,79 @@ import json
 from pprint import pprint
 from functools import partial
 
+def split(data, fraction):
+    assert(0 <= fraction && fraction <= 1)
+    total = len(data)
+    num_first = floor(fraction*total)
+    num_second = total - num_first
+    first = data[:num_first]
+    second = data[num_first:]
+    return (first, second)
+
 def stats(ocr, em, book_path):
     pagewise = webtotrain.read_book(book_path)
-    #pagewise = pagewise[-6:]
-    leave_out = randint(3, len(pagewise))
     images, truths = [], []
     for imgs, ts in pagewise:
         images.extend(imgs)
         truths.extend(ts)
 
-    #em.enhance_vocabulary(truths)
     print("Recognizing..", flush=True)
     predictions = [ocr.recognize(image) for image in images]
-    print("Computing Errors", flush=True)
-    errors = [em.error(prediction) for prediction in predictions]
-    tuples = list(zip(truths, predictions, errors))
 
-    threshold_f = lambda x: x[2] == 0
-    correct = filter(threshold_f, tuples)
-    wrong = filter(lambda x: not threshold_f(x), tuples)
+    stat_d = {}
 
-    stat_d = {
-            "real_word_error": 0,
-            "correct": 0,
-            "correctable": 0,
-            "incorrectable": 0
-    }
+    for fraction in [0.2, 0.4, 0.6, 0.8]:
+        first, second = split(pagewise, fraction)
+        vocab_from_book = []
+        for imgs, ts in first:
+            vocab_from_book.extend(ts)
+        em.enhance_vocabulary(vocab_from_book)
+        print("Computing Errors", flush=True)
+        errors = [em.error(prediction) for prediction in predictions]
+        tuples = list(zip(truths, predictions, errors))
 
-    for truth, prediction, error in correct:
-        if truth != prediction:
-            stat_d["real_word_error"] += 1
-        else:
-            stat_d["correct"] += 1
+        threshold_f = lambda x: x[2] == 0
+        correct = filter(threshold_f, tuples)
+        wrong = filter(lambda x: not threshold_f(x), tuples)
 
-    for truth, prediction, error in wrong:
-        suggestions = em.suggest(prediction)
-        if truth in suggestions:
-            stat_d["correctable"] += 1
-        else:
-            stat_d["incorrectable"] += 1
+        sfd = {
+                "real_word_error": 0,
+                "correct": 0,
+                "correctable": 0,
+                "incorrectable": 0
+        }
 
-    correct = sum([1 for truth,prediction in zip(truths, predictions) \
-            if truth==prediction])
+        for truth, prediction, error in correct:
+            if truth != prediction:
+                sfd["real_word_error"] += 1
+            else:
+                sfd["correct"] += 1
 
-    stat_d["word_accuracy"] = (correct/len(images))*100
-    sum_edit_distances = sum(
-            [ distance(truth, prediction) \
-                    for truth, prediction in zip(truths, predictions)]
-            )
+        for truth, prediction, error in wrong:
+            suggestions = em.suggest(prediction)
+            if truth in suggestions:
+                sfd["correctable"] += 1
+            else:
+                sfd["incorrectable"] += 1
 
-    total_length = sum(map(len, truths))
-    stat_d["character_error_rate"] = (sum_edit_distances/total_length)*100
-    stat_d["correct_without_dict"] = sum(
-            [1 for truth, prediction in zip(truths, predictions)
-                    if truth == prediction]
-            )
-    stat_d["total"] = len(images)
+        correct = sum([1 for truth,prediction in zip(truths, predictions) \
+                if truth==prediction])
+
+        sfd["word_accuracy"] = (correct/len(images))*100
+        sum_edit_distances = sum(
+                [ distance(truth, prediction) \
+                        for truth, prediction in zip(truths, predictions)]
+                )
+
+        total_length = sum(map(len, truths))
+        sfd["character_error_rate"] = (sum_edit_distances/total_length)*100
+        sfd["correct_without_dict"] = sum(
+                [1 for truth, prediction in zip(truths, predictions)
+                        if truth == prediction]
+                )
+        sfd["total"] = len(images)
+        stat_d[fraction] = sfd
+
     stat_d["book_dir"] = book_path
     return stat_d
 
