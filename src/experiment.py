@@ -22,7 +22,7 @@ from error_module import Dictionary
 import cv2
 import sys
 from aux.tokenizer import tokenize
-from aux import webtotrain
+from parser import webtotrain
 from timeit import timeit
 from Levenshtein import distance
 from random import randint
