@@ -1,3 +1,21 @@
+
+#!/usr/bin/python3
+
+#SBATCH --output=output/parallel-%j.out
+#SBATCH --partition=atom-cpu
+#SBATCH -n 16 # 10 cores
+#SBATCH -N 7
+#SBATCH --overcommit
+
+import sys
+import os
+import multiprocessing
+
+# Necessary to add cwd to path when script run
+# by SLURM (since it executes a copy)
+sys.path.append(os.getcwd())
+
+
 from ocr import GravesOCR
 import numpy as np
 from error_module import Dictionary
@@ -8,11 +26,12 @@ from aux import webtotrain
 from timeit import timeit
 from Levenshtein import distance
 from random import randint
-
+import json
 from pprint import pprint
+from functools import partial
 
 def stats(ocr, em, book_path):
-    pagewise = webtotrain.read_book(book_dir)
+    pagewise = webtotrain.read_book(book_path)
     #pagewise = pagewise[-6:]
     leave_out = randint(3, len(pagewise))
     images, truths = [], []
@@ -62,34 +81,39 @@ def stats(ocr, em, book_path):
 
     total_length = sum(map(len, truths))
     stat_d["character_error_rate"] = (sum_edit_distances/total_length)*100
-
     stat_d["correct_without_dict"] = sum(
             [1 for truth, prediction in zip(truths, predictions)
                     if truth == prediction]
             )
     stat_d["total"] = len(images)
-
+    stat_d["book_dir"] = book_path
     return stat_d
 
-
-ocr = GravesOCR(
-        "parameters/models/Malayalam2.xml",  # Weights file
-        "parameters/lookups/Malayalam.txt")
-
-
-
-error_path = 'parameters/error/Malayalam/'
-kwargs = {}
-for key in ['alphabet', 'save', 'words']:
-    kwargs[key] = error_path + key
+def work(config, book_loc):
+    ocr = GravesOCR(config["model"], config["lookup"])
+    error = Dictionary(**config["error"])
+    statd = stats(ocr, error, book_loc)
+    return statd
 
 
-D = Dictionary(**kwargs)
+if __name__ == '__main__':
+    config = json.load(open(sys.argv[1]))
 
-book_dir='/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/'+sys.argv[1]+'/'
-#images, truths = webtotrain.read_book(book_dir)
-print(sys.argv[1])
-sd = stats(ocr, D, book_dir)
-pprint(sd)
-exit()
+    ncpus = None
+    # get number of cpus available to job
+    try:
+        ncpus = int(os.environ["SLURM_JOB_CPUS_PER_NODE"])
+    except KeyError:
+        ncpus = multiprocessing.cpu_count()
+
+    print("ncpus found:", ncpus)
+    partial_work = partial(work, config)
+    book_locs = map(lambda x: config["dir"] + x + '/', config["books"])
+    p = multiprocessing.Pool(ncpus)
+    stats_ls = p.map(partial_work, book_locs)
+    p.close()
+    p.join()
+    print(list(stats_ls))
+
+
 

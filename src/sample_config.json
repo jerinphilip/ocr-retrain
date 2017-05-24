@@ -1,0 +1,44 @@
+{
+    "model": "parameters/models/Malayalam2.xml",
+    "lookup": "parameters/lookups/Malayalam.txt",
+    "error": {
+        "save": "parameters/error/Malayalam/save",
+        "words": "parameters/error/Malayalam/words",
+        "alphabet": "parameters/error/Malayalam/alphabet"
+    },
+
+    "dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/",
+    "books": [
+        "0002",
+        "0003",
+        "0004",
+        "0005",
+        "0006",
+        "0008",
+        "0009",
+        "0018",
+        "0028",
+        "0072",
+        "0075",
+        "0078",
+        "0109",
+        "0128",
+        "0135",
+        "0175",
+        "0188",
+        "0230",
+        "0231",
+        "0235",
+        "0236",
+        "0237",
+        "0238",
+        "0239",
+        "0240",
+        "0241",
+        "0242",
+        "0243",
+        "0244",
+        "0245",
+        "0246"
+    ]
+}
