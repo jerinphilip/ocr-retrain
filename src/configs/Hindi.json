@@ -1,5 +1,5 @@
 {
-    "model": "parameters/models/Hindi.xml", 
+    "model": "parameters/models/word/Hindi.xml", 
     "books": [
         "0365", 
         "0061", 
@@ -37,7 +37,7 @@
     "lookup": "parameters/lookups/Hindi.txt", 
     "dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Hindi/", 
     "error": {
-        "alphabet": "", 
+        "alphabet": "parameters/error/Hindi/alphabet", 
         "save": "parameters/error/Hindi/save_crawled", 
         "words": ""
     }

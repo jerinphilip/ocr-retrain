@@ -35,12 +35,11 @@ def stats(ocr, em, book_path):
         images.extend(imgs)
         truths.extend(ts)
 
-    print("Recognizing..", flush=True)
     predictions = [ocr.recognize(image) for image in images]
-
     stat_d = {}
 
-    for fraction in [0.2, 0.4, 0.6, 0.8]:
+    fractions = map(lambda x: x/10, range(11))
+    for fraction in fractions:
         si = split_index(pagewise, fraction)
         em.enhance_vocabulary(truths[:si])
         print("Computing Errors, with fraction %.1f"%(fraction), flush=True)
@@ -89,5 +88,5 @@ if __name__ == '__main__':
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
     stat_d = stats(ocr, error, book_locs[book_index])
-    with open('%s/ml-ocr/stats_%s.json'%(output_dir, config["books"][book_index]), 'w+') as fp:
+    with open('%s/hi-ocr/stats_%s.json'%(output_dir, config["books"][book_index]), 'w+') as fp:
         json.dump(stat_d, fp, indent=4)
