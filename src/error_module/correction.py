@@ -6,7 +6,7 @@ from Levenshtein import distance
 #with open('/home/avijit/corpus/english/eng_news_2015_10K/eng_news_2015_10K-sentences.txt','r') as in_file:
  #   text = in_file.read()
   #  dictionary = sorted(list(set(tokenize(text))))
-
+#added a comment
 class Correction:
     def __init__(self,*args,**kwargs):
         with open(kwargs['vocabulary'], encoding='utf-8') as fp:
