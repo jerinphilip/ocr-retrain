@@ -39,6 +39,6 @@
     "error": {
         "alphabet": "parameters/error/Hindi/alphabet", 
         "save": "parameters/error/Hindi/save_crawled", 
-        "words": ""
+        "words": "/data5/deepayan/webocr/combined.txt"
     }
 }

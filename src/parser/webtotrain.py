@@ -5,7 +5,7 @@ import numpy as np
 # Parse line.xml file.
 def parse_ocr_xml(xml_file):
     with open(xml_file, encoding='utf-8') as f:
-        print("Read", xml_file)
+        #print("Read", xml_file)
         root = etree.parse(f)
         rows = root.xpath("row")
 

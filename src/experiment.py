@@ -29,7 +29,7 @@ def split_index(data, fraction):
 
 def stats(ocr, em, book_path):
     pagewise = webtotrain.read_book(book_path)
-    #pagewise = pagewise[5:10]
+    pagewise = pagewise[5:10]
     images, truths = [], []
     for imgs, ts in pagewise:
         images.extend(imgs)
@@ -50,7 +50,11 @@ def stats(ocr, em, book_path):
                 "correctable": 0,
                 "correct": 0,
                 "uncorrectable":0,
-                "total": 0
+                "total": 0,
+                "ocr_equals_gt": {
+                    "correctable": 0,
+                    "uncorrectable": 0
+                }
             }
 
 
@@ -72,8 +76,12 @@ def stats(ocr, em, book_path):
                 suggestions = em.suggest(prediction)
                 if truth in suggestions:
                     sfd[dkey(i<si)]["correctable"] += 1
+                    if truth == prediction:
+                        sfd[dkey(i<si)]["ocr_equals_gt"]["correctable"] += 1
                 else:
                     sfd[dkey(i<si)]["uncorrectable"] += 1
+                    if truth == prediction:
+                        sfd[dkey(i<si)]["ocr_equals_gt"]["uncorrectable"] += 1
 
         stat_d[fraction] = sfd
 
@@ -83,10 +91,11 @@ def stats(ocr, em, book_path):
 if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
     book_index = int(sys.argv[2])
+    lang = sys.argv[3]
     output_dir = 'output'
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
     stat_d = stats(ocr, error, book_locs[book_index])
-    with open('%s/hi-ocr/stats_%s.json'%(output_dir, config["books"][book_index]), 'w+') as fp:
-        json.dump(stat_d, fp, indent=4)
+    with open('%s/%s/stats_%s.json'%(output_dir, lang, config["books"][book_index]), 'w+') as fp:
+            json.dump(stat_d, fp, indent=4)

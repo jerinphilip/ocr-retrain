@@ -41,21 +41,15 @@ class Dictionary:
         rule = lambda x: distance(x, word) <= 3
         suggestions = list(filter(rule, self.trie))
         suggestions = sorted(suggestions, key=lambda x: distance(x, word))
-        n = min(5, len(suggestions))
+        n = min(10, len(suggestions))
         return suggestions[:n]
 
     def suggest_v1(self, word):
         intrie = lambda x: x in self.trie or x in self.secondary_trie
         candidates = list(self.edits1(word) or self.edits2(word))
-        #cand1 = set(filter(intrie, self.edits1(word)))
-        #print("Edits1: ",len(cand1))
-        #cand2 = set(filter(intrie, self.edits2(word)))
-        #print("Edits2: ", len(cand2))
         in_dictionary = list(filter(intrie, candidates))
-        #in_dictionary = list(cand1 or cand2)
-        #print(len(in_dictionary), flush=True)
         suggestions = sorted(in_dictionary, key=lambda x: distance(x, word))
-        n = min(5, len(suggestions))
+        n = min(10, len(suggestions))
         return suggestions[:n]
 
     def suggest_v2(self, word):
