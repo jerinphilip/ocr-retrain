@@ -7,6 +7,7 @@ with open('/data5/deepayan/webocr/Hindi/combined.txt','r') as in_file:
     text = in_file.read()
     dictionary = sorted(list(set(tokenize(text))))
     print (len(dictionary))
+
 class Correction:
     def __init__(self,*args,**kwargs):
         if 'words' in kwargs:
