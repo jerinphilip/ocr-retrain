@@ -1,2 +1,2 @@
 from .dictionary import Dictionary
-from .correction import Correction
+#from .correction import Correction

@@ -6,6 +6,7 @@ class Dictionary:
     def __init__(self, *args, **kwargs):
         self.trie = Trie()
         self.secondary_trie = Trie()
+        self.book_trie = Trie()
         path = os.path.dirname(os.path.realpath(__file__)) + "/"
         if 'save' in kwargs:
             self.trie.load(kwargs['save'])
@@ -15,6 +16,9 @@ class Dictionary:
                 self.trie = Trie(keys)
 
         self.preprocess(kwargs['alphabet'])
+
+    def enhance_vocab_with_books(self, words):
+        self.book_trie = Trie(words)
 
     def enhance_vocabulary(self, words):
         self.secondary_trie = Trie(words)
@@ -45,7 +49,7 @@ class Dictionary:
         return suggestions[:n]
 
     def suggest_v1(self, word):
-        intrie = lambda x: x in self.trie or x in self.secondary_trie
+        intrie = lambda x: x in self.trie or x in self.secondary_trie or x in self.book_trie
         candidates = list(self.edits1(word) or self.edits2(word))
         in_dictionary = list(filter(intrie, candidates))
         suggestions = sorted(in_dictionary, key=lambda x: distance(x, word))
@@ -54,7 +58,7 @@ class Dictionary:
 
     def suggest_v2(self, word):
         rep_word = frozenset(list(word))
-        intrie = lambda x: x in self.trie
+        intrie = lambda x: x in self.trie or x in self.secondary_trie or x in self.book_trie
         candidates = []
         for key in self.inv_map:
             if len(rep_word ^ key) < 3:

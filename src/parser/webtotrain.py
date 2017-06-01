@@ -114,3 +114,13 @@ def read_book(book_dir_path):
     pagewise = images_and_truths(ud, word_mapping_f)
     return pagewise
 
+
+def full_text(book_dir_path):
+    """ Used to extract all the vocabulary in a particular book """
+    text_file = book_dir_path + 'text.xml'
+    text_d = parse_ocr_xml(text_file)
+    text = ""
+    for d in text_d:
+        text += d["Text"]
+    return text
+
