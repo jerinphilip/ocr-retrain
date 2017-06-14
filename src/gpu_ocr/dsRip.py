@@ -1,7 +1,4 @@
-
-import torch
 import torch.nn as nn
-
 
 class SequenceWise(nn.Module):
     def __init__(self, module):
@@ -44,36 +41,4 @@ class BatchRNN(nn.Module):
         if self.bidirectional:
             x = x.view(x.size(0), x.size(1), 2, -1).sum(2).view(x.size(0), x.size(1), -1)  # (TxNxH*2) -> (TxNxH) by sum
         return x
-
-
-
-inputSize = 32
-hiddenSize = 50
-labelCount = 20
-hiddenCount = 3
-
-def create_hidden(i):
-    parameters = {
-            "input_size": hiddenSize,
-            "hidden_size": hiddenSize,
-            "rnn_type": nn.LSTM,
-            "bidirectional": True,
-            "batch_norm": i==0
-    }
-    rnn = BatchRNN(**parameters)
-    return rnn
-
-rnns = list(map(create_hidden, range(hiddenCount)))
-
-inputLayer = nn.Linear(inputSize, hiddenSize)
-outputLayer = nn.Linear(hiddenSize, labelCount)
-
-layers = [inputLayer] + rnns + [outputLayer]
-
-net = nn.Sequential(
-        *layers
-        )
-
-print(net)
-
 
