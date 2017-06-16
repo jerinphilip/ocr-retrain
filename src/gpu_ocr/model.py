@@ -1,30 +1,52 @@
-from .dsRip import BatchRNN
-import torch.nn as nn
+import torch
+from torch import nn, optim
+from torch.autograd import Variable
+import numpy as np
+from warpctc_pytorch import CTCLoss
 
-def create_network(**kwargs):
-    hidden_size = kwargs['hidden_size']
-    input_size = kwargs['input_size']
-    output_classes = kwargs['output_classes']
-    hidden_depth = kwargs['hidden_depth']
+class GravesBatchRNN(nn.Module):
+    def __init__(self):
+        super(GravesBatchRNN, self).__init__()
+        self.rnn = nn.LSTM(input_size=50, hidden_size=50, bidirectional=True, bias=True)
 
-    def create_hidden(i):
-        parameters = {
-                "input_size": hidden_size,
-                "hidden_size": hidden_size,
-                "rnn_type": nn.LSTM,
-                "bidirectional": True,
-                "batch_norm": False
-        }
-        rnn = BatchRNN(**parameters)
-        return rnn
+    def forward(self, x):
+        x, _ = self.rnn(x)
+        #  _ is hidden states, and cell states?
+        x = x.view(x.size(0), x.size(1), 2, -1).sum(2).view(x.size(0), x.size(1), -1)
+        return x
 
-    rnns = list(map(create_hidden, range(hidden_depth)))
+class GravesNN(nn.Module):
+    def __init__(self, input_size, output_classes):
+        super(GravesNN, self).__init__()
+        self.fc_in = nn.Linear(input_size,50)
+        self.fc_out = nn.Linear(50, output_classes)
+        hidden_ls = [GravesBatchRNN() for i in range(3)]
+        self.hidden = nn.Sequential(*hidden_ls)
 
-    inputLayer = nn.Linear(input_size, hidden_size)
-    outputLayer = nn.Linear(hidden_size, output_classes)
+    def forward(self, x):
 
-    layers = [inputLayer] + rnns + [outputLayer]
+        # Reshaping to handle variable length sequences in FC layer.
+        t, n = x.size(0), x.size(1)
+        x = x.view(t*n, -1)
+        x = self.fc_in(x)
+        x = x.view(t, n, -1)
 
-    net = nn.Sequential(*layers)
-    return net
+        x = self.hidden(x)
+
+        # Reshaping to handle variable length sequences in FC layer.
+        t, n = x.size(0), x.size(1)
+        x = x.view(t*n, -1)
+        x = self.fc_out(x)
+        x = x.view(t, n, -1)
+        return x
+
+
+if __name__ == '__main__':
+    G = GravesNN(32, 108)
+    x = np.random.randn(1, 50, 32)
+    x = torch.Tensor(x)
+    x = Variable(x, requires_grad=False)
+    y = G(x)
+    print(y.size())
+
 

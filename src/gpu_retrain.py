@@ -1,14 +1,23 @@
-from gpu_ocr.model import create_network
+from torch.autograd import Variable
 from warpctc_pytorch import CTCLoss
+import torch
+from parser.webtotrain import read_book
+from gpu_ocr.train import train
+import numpy as np
 
-Net = create_network(input_size=30, hidden_size=50, hidden_depth=3, output_classes=108)
-print(Net)
-Criterion = CTCLoss()
 
-# Load inputs as images, truths
-inputs = #Load here
-targets = #Load here
-max_epochs = 1000
-for epoch in range(max_epochs):
-    print(epoch)
+if __name__ == '__main__':
+    pagewise = read_book("/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0006/")
+    xs = []
+    ys = []
+    for (imgs, truths) in pagewise:
+        for img, truth in zip(imgs, truths):
+            x = torch.Tensor(np.array(img, dtype=np.float32).T)
+            t, h = x.size()
+            x = x.contiguous().view(1, t, h)
+            xs.append(x)
+            ys.append(truth)
+    print(len(xs), len(ys))
+
+    train(xs, ys, "/OCRData2/ocr/retrain/src/parameters/lookups/Malayalam.txt")
 
