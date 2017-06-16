@@ -19,5 +19,6 @@ if __name__ == '__main__':
             ys.append(truth)
     print(len(xs), len(ys))
 
-    train(xs, ys, "/OCRData2/ocr/retrain/src/parameters/lookups/Malayalam.txt")
+    trim = 8
+    train(xs[:trim], ys[:trim], "/OCRData2/ocr/retrain/src/parameters/lookups/Malayalam.txt")
 

@@ -23,27 +23,35 @@ def train(xs, ys, lookup_file):
     invLabelDict = dict(enumerate(labels))
     model = GravesNN(32, len(labels))
     model.cuda()
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.2,
-                momentum=0.2, nesterov=True)
+    optimizer = torch.optim.SGD(model.parameters(), lr=3e-2,
+                momentum=0.8, nesterov=True)
     model.train()
-    for x, gt in zip(xs, ys):
-        x = x.cuda()
-        x = Variable(x, requires_grad=True)
-        z = list(map(lambda t: labelDict[t], gt))
-        label_sizes = Variable(torch.IntTensor([len(z)]))
-        z = Variable(torch.IntTensor(z), requires_grad=False)
-        y = model(x)
+    while True:
+        for x, gt in zip(xs, ys):
+            x = x.cuda()
+            x = Variable(x, requires_grad=True)
+            z = list(map(lambda t: labelDict[t], gt))
+            label_sizes = Variable(torch.IntTensor([len(z)]))
+            z = Variable(torch.IntTensor(z), requires_grad=False)
+            y = model(x)
 
-        print(x.size())
-        print(y)
 
-        _, lsize, class_size = y.size()
-        y = y.view(lsize, class_size)
-        y_sizes = Variable(torch.IntTensor([class_size]))
-        loss = criterion(y, z, y_sizes, label_sizes)
-        print(loss)
-        #loss.backward()
-        #optimizer.step()
+            #print("Input Dims:", x.size())
+            #print("Output Dims:", y.size())
+
+            _, lsize, class_size = y.size()
+            y = y.transpose(0, 1)
+            #y_sizes = Variable(torch.IntTensor([class_size for i in range(lsize)]))
+            y_sizes = Variable(torch.IntTensor([lsize]))
+
+            #print("y_sizes:", y_sizes)
+            #print("label_sizes:", label_sizes)
+            loss = criterion(y, z, y_sizes, label_sizes)
+            if loss.data[0] != float("inf"):
+                print(loss.data[0])
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
     return model
 
