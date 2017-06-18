@@ -23,10 +23,12 @@ def train(xs, ys, lookup_file):
     invLabelDict = dict(enumerate(labels))
     model = GravesNN(32, len(labels))
     model.cuda()
-    optimizer = torch.optim.SGD(model.parameters(), lr=3e-2,
+    optimizer = torch.optim.SGD(model.parameters(), lr=3e-4,
                 momentum=0.8, nesterov=True)
     model.train()
     while True:
+        total_loss = 0
+        count = 0
         for x, gt in zip(xs, ys):
             x = x.cuda()
             x = Variable(x, requires_grad=True)
@@ -39,7 +41,7 @@ def train(xs, ys, lookup_file):
             #print("Input Dims:", x.size())
             #print("Output Dims:", y.size())
 
-            _, lsize, class_size = y.size()
+            _, lsize,class_size = y.size()
             y = y.transpose(0, 1)
             #y_sizes = Variable(torch.IntTensor([class_size for i in range(lsize)]))
             y_sizes = Variable(torch.IntTensor([lsize]))
@@ -48,10 +50,15 @@ def train(xs, ys, lookup_file):
             #print("label_sizes:", label_sizes)
             loss = criterion(y, z, y_sizes, label_sizes)
             if loss.data[0] != float("inf"):
-                print(loss.data[0])
+                count += 1
+                total_loss += loss.data[0]
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+        if count != 0:
+            print("Avg Loss=%lf"%(total_loss/count))
+        else:
+            print("WTF")
 
     return model
 

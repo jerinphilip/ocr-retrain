@@ -44,8 +44,6 @@ def extract_atoms(image_location, atoms):
             subImg = np.zeros((32, 32))
 
         height, width = subImg.shape
-        #print(subImg.shape)
-        # TODO Take care of zero height
         ratio = 32/height
         resized = cv2.resize(subImg, None, fx=ratio, fy=ratio, 
                 interpolation = cv2.INTER_CUBIC)
@@ -92,7 +90,7 @@ def line_mapping_f(text, atoms):
     olines = []
     for atom in atoms:
         i = int(atom["LineNo"])
-        olines.append(lines[i])
+        olines.append(lines[i-1])
     return (olines, atoms)
 
 def word_mapping_f(text, atoms):
@@ -105,13 +103,18 @@ def word_mapping_f(text, atoms):
     return (owords, atoms)
 
 
-def read_book(book_dir_path):
+def read_book(book_dir_path, opt_unit='word'):
     obtainxml = lambda f: book_dir_path + f + '.xml'
     filenames = map(obtainxml, ['line', 'word', 'text'])
     lines, words, text = list(map(parse_ocr_xml, filenames))
-    ud = group(text, words)
+    units = words
+    mapping_f = word_mapping_f
+    if opt_unit == 'line':
+        units = lines
+        mapping_f = line_mapping_f
+    ud = group(text, units)
     ud["prefix"] = book_dir_path
-    pagewise = images_and_truths(ud, word_mapping_f)
+    pagewise = images_and_truths(ud, mapping_f)
     return pagewise
 
 

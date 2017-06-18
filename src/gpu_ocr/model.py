@@ -7,7 +7,7 @@ from warpctc_pytorch import CTCLoss
 class GravesBatchRNN(nn.Module):
     def __init__(self):
         super(GravesBatchRNN, self).__init__()
-        self.rnn = nn.LSTM(input_size=50, hidden_size=50, bidirectional=True, bias=True)
+        self.rnn = nn.LSTM(input_size=50, hidden_size=50, bidirectional=True, bias=True, batch_first=True)
 
     def forward(self, x):
         x, _ = self.rnn(x)
@@ -26,18 +26,18 @@ class GravesNN(nn.Module):
     def forward(self, x):
 
         # Reshaping to handle variable length sequences in FC layer.
-        t, n = x.size(0), x.size(1)
-        x = x.view(t*n, -1)
+        batch_size, timesteps = x.size(0), x.size(1)
+        x = x.view(batch_size*timesteps, -1)
         x = self.fc_in(x)
-        x = x.view(t, n, -1)
+        x = x.view(batch_size, timesteps, -1)
 
         x = self.hidden(x)
 
         # Reshaping to handle variable length sequences in FC layer.
-        t, n = x.size(0), x.size(1)
-        x = x.view(t*n, -1)
+        batch_size, timesteps = x.size(0), x.size(1)
+        x = x.view(batch_size*timesteps, -1)
         x = self.fc_out(x)
-        x = x.view(t, n, -1)
+        x = x.view(batch_size, timesteps, -1)
         return x
 
 
