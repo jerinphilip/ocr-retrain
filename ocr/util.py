@@ -14,7 +14,7 @@ def concat(seq_targ_1, seq_targ_2):
     H2, W2 = seq_1.shape
 
     assert(H1 == H2)
-    w_blank = H1 # 
+    w_blank = H1
     blank = np.ones((H1, w_blank), dtype=np.uint8)
     seq = np.concatenate((seq_1, blank, seq_2), axis=1)
     target = targ_1 + ' ' + targ_2
@@ -27,13 +27,16 @@ def knot(ls, **kwargs):
     if 'max_width' in kwargs:
         max_width = kwargs['max_width'] 
 
+    # Subroutine to knot.
+    if not ls:  return [] # Base case.
+    get_width = lambda x: x[0].shape[1] # Helper Function - Don't repeat.
 
-    if not ls:  return []
-
-    get_width = lambda x: x[0].shape[1]
+    # Initialization
     knotted = [ls[0]]
     width = get_width(ls[0]) 
     current = 0
+
+    # Invariant: ?
     for i in range(1, len(ls)):
         next_width = get_width(ls[i])
         if width + next_width < max_width:
@@ -42,7 +45,6 @@ def knot(ls, **kwargs):
         else:
             knotted.append(ls[i])
             current = current + 1
-            width = next_width 
 
     return knotted
 
@@ -51,7 +53,8 @@ def gpu_format(label_map):
     def ocr_ready(seq_targ):
         seq, targ = seq_targ
         seq = torch.Tensor(np.array([seq], dtype=np.float32))
-        seq = seq.permute(2, 0, 1).contiguous() # Convert to TxBxH
+        # The above generates BxHxT - Convert to TxBxH
+        seq = seq.permute(2, 0, 1).contiguous() 
         targ = list(map(lambda x: label_map[x], targ))
         return (seq, targ)
     return ocr_ready
