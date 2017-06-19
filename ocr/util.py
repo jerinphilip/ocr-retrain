@@ -56,5 +56,6 @@ def gpu_format(label_map):
         # The above generates BxHxT - Convert to TxBxH
         seq = seq.permute(2, 0, 1).contiguous() 
         targ = list(map(lambda x: label_map[x], targ))
+        targ = torch.IntTensor(targ)
         return (seq, targ)
     return ocr_ready
