@@ -11,3 +11,22 @@ def gpu_format(label_map):
         targ = torch.IntTensor(targ)
         return (seq, targ)
     return ocr_ready
+
+
+class AverageMeter:
+    def __init__(self, name):
+        self.name = name
+        self.count = 0
+        self.total = 0
+
+    def add(self, element):
+        self.total += element
+        self.count += 1
+
+    def compute(self):
+        if self.count == 0:
+            return float("inf")
+        return self.total/self.count
+    
+    def __str__(self):
+        return "Average %s: %.6lf"%(self.name, self.compute())
