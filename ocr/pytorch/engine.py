@@ -23,28 +23,40 @@ class Engine:
 
     def train(self, inputs):
         self.model.cuda()
-        self.optim = optim.SGD(self.model.parameters(), **self.optim_params)
+        self.optimizer = optim.SGD(self.model.parameters(), **self.optim_params)
         self.criterion = CTCLoss()
         for seq, target in inputs:
             # CUDA things
             seq = seq.cuda()
             #target = target.cuda()
-            seq = Variable(seq)
+            seq = Variable(seq, requires_grad=False)
             target = Variable(target, requires_grad=False)
 
             # Feedforward
             net_output = self.model(seq)
-            prediction = net_output.transpose(0, 1)
+            #prediction = net_output.transpose(0, 1)
+            prediction = net_output
 
             # Sizes
-            target_sizes = Variable(torch.IntTensor([target.size(0)]))
-            pred_sizes = Variable(torch.IntTensor([prediction.size(1)]))
+            #print(prediction.size(1))
+            #print(target.size(0))
+            target_sizes = Variable(torch.IntTensor([target.size(0)]), 
+                    requires_grad=False)
+            pred_sizes = Variable(torch.IntTensor([prediction.size(0)]), 
+                    requires_grad=False)
 
             # Compute Loss
-            loss = self.criterion(prediction, target, pred_sizes, target_sizes)
+            loss = self.criterion(prediction, target, 
+                    pred_sizes, target_sizes)
             print(loss.data[0])
 
             # Backpropogate
-            optimizer.zero_grad()
+            self.optimizer.zero_grad()
             loss.backward()
-            optimizer.step()
+            self.optimizer.step()
+
+    def test(self, inputs):
+        raise NotImplementedError
+
+    def validate(self, inputs):
+        raise NotImplementedError
