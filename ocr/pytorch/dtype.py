@@ -26,10 +26,7 @@ class GravesNN(nn.Module):
     def __init__(self, **kwargs):
         super(GravesNN, self).__init__()
 
-	default = {
-		'hidden_size': 50,
-		'depth': 3
-	}
+        default = { 'hidden_size': 50, 'depth': 3 }
         for key in default:
             if key not in kwargs:
                 kwargs[key] = default[key]

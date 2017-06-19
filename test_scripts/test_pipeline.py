@@ -39,3 +39,10 @@ lookup_filename = "/OCRData2/ocr/retrain/src/parameters/lookups/Malayalam.txt"
 lmap, ilmap = codebook(lookup_filename)
 format_f = gpu_format(lmap)
 print(format_f(train[0]))
+
+# Test-7 - Test training engine
+from ocr.pytorch.engine import Engine
+engine = Engine(input_size=32, output_classes=len(lmap.keys()))
+engine.train(list(map(format_f, train)))
+
+
