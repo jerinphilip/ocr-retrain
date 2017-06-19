@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 def concat(seq_targ_1, seq_targ_2):
     """ 
@@ -44,3 +45,13 @@ def knot(ls, **kwargs):
             width = next_width 
 
     return knotted
+
+
+def gpu_format(label_map):
+    def ocr_ready(seq_targ):
+        seq, targ = seq_targ
+        seq = torch.Tensor(np.array([seq], dtype=np.float32))
+        seq = seq.permute(2, 0, 1).contiguous() # Convert to TxBxH
+        targ = list(map(lambda x: label_map[x], targ))
+        return (seq, targ)
+    return ocr_ready
