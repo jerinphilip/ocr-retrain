@@ -47,6 +47,6 @@ engine = Engine(input_size=32, output_classes=len(lmap.keys()))
 convert_gpu = lambda x: list(map(gpu_format(lmap), x))
 train_set = convert_gpu(train)
 validation_set = convert_gpu(validation)
-engine.train(train_set, validation_set)
+engine.train(train_set, validation_set,lookup_filename)
 
 

@@ -4,7 +4,7 @@ from torch import nn, optim
 from torch.autograd import Variable
 import torch
 from .util import AverageMeter
-
+from decoder import ArgMaxDecoder
 class Engine:
     def __init__(self, **kwargs):
         self.model = GravesNN(input_size=kwargs['input_size'], 
@@ -41,7 +41,9 @@ class Engine:
         # Compute Loss
         loss = self.criterion(prediction, target, 
                 pred_sizes, target_sizes)
-
+        # Decode
+        decoded_output = self.decoder.decode(prediction.data, pred_sizes)
+        target_strings = self.decoder.process_strings(self.decoder.convert_to_strings(split_targets))
         # Backpropogate
         if not kwargs['validation']:
             self.optimizer.zero_grad()
@@ -49,17 +51,24 @@ class Engine:
             self.optimizer.step()
         return loss.data[0]
 
-    def train(self, train_set, validation_set):
+    def train(self, train_set, validation_set, lookup_file):
         self.model.cuda()
         self.optimizer = optim.SGD(self.model.parameters(), **self.optim_params)
         self.criterion = CTCLoss()
+
+        with open(lookup_file, "r") as fp:
+            labels = fp.read().splitlines()
+            labels = list(map(convert, labels))
+            labels = [''] + labels
+        self.decoder = ArgMaxDecoder(labels)
         satisfactory = False
 
         while not satisfactory:
             avgTrain = AverageMeter("train loss")
             for pair in train_set:
-                loss = self.train_subroutine(pair, validation=False)
+                loss, out, sizes = self.train_subroutine(pair, validation=False)
                 avgTrain.add(loss)
+
             print(avgTrain)
             avgValidation = AverageMeter("validation loss")
             for pair in validation_set:
