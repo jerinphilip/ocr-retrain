@@ -33,7 +33,7 @@ train = knot(loader.split.train, max_width=8192)
 print(train[0][1])
 
 # Test-6 - Convert to gpu ready
-from ocr.util import gpu_format
+from ocr.pytorch.util import gpu_format
 from parser.lookup import codebook
 lookup_filename = "/OCRData2/ocr/retrain/src/parameters/lookups/Malayalam.txt"
 lmap, ilmap = codebook(lookup_filename)
