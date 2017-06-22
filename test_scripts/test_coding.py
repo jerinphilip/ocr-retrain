@@ -66,7 +66,7 @@ except FileNotFoundError:
     }
 
 engine = Engine(**kwargs)
-for seq, targ in train_set:
+for seq, targ in validation_set:
     probs = engine.recognize(seq)
     string = decoder.decode(probs)
     print(decoder.to_string(targ)," = ", string)
