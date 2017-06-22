@@ -16,7 +16,13 @@ class Decoder:
         """ Convert a probability matrix to sequences """
         _, max_probs = torch.max(probs.transpose(0, 1), 2)
         max_probs = max_probs.squeeze()
-        #print(max_probs.size())
         ls = max_probs.data.tolist()
-        #print(self.to_string(ls))
-        pass
+        compressed = self.compress(ls)
+        return self.to_string(compressed)
+
+    def compress(self, values):
+        result = []
+        for i in range(1, len(values)):
+            if values[i] != values[i-1]:
+                result.append(values[i-1])
+        return result

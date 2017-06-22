@@ -14,6 +14,7 @@ class Engine:
                 output_classes=kwargs['output_classes'])
 
 
+
         self.optim_params = {
             'lr': 3e-4,
             'momentum': 0.8,
@@ -40,34 +41,24 @@ class Engine:
         #seq, target, psizes, lsizes = batch
         seq, target = batch
         seq = seq.cuda()
-        #target = target.cuda()
         seq = Variable(seq, requires_grad=False)
         target = Variable(target, requires_grad=False)
 
         # Feedforward
         net_output = self.model(seq)
-        prediction = net_output
-        #prediction = net_output.transpose(0, 1)
-
+        prediction = net_output.contiguous()
+    
         # Sizes
-        print("Prediction.size():", prediction.size())
-        print("Target.size():", target.size())
         target_sizes = Variable(torch.IntTensor([target.size(0)]), 
                 requires_grad=False)
         pred_sizes = Variable(torch.IntTensor([prediction.size(0)]), 
                 requires_grad=False)
 
-        #print("Target size:", target_sizes)
-        #print("Pred sizes:", pred_sizes)
-        #lsizes = Variable(lsizes, requires_grad=False)
-        #psizes = Variable(psizes, requires_grad=False)
-
         # Compute Loss
+        self.criterion.cuda()
         loss = self.criterion(prediction, target, 
-                #psizes, lsizes)
                 pred_sizes, target_sizes)
-
-        print("Loss:", loss.data[0])
+        # print("Loss:", loss.data[0])
         # Backpropogate
         if not kwargs['validation']:
             self.optimizer.zero_grad()
@@ -77,7 +68,7 @@ class Engine:
 
 
     def export(self):
-        self._kwargs['save'] = self.model.state_dict()
+        self._kwargs['state_dict'] = self.model.state_dict()
         return self._kwargs
 
     def train(self, train_set, validation_set, **kwargs):
@@ -85,7 +76,6 @@ class Engine:
         f = lambda x: x
         if 'debug' in kwargs and kwargs['debug']:
             f = tqdm
-            f = lambda x: x
 
         avgTrain = AverageMeter("train loss")
         for pair in f(train_set):
@@ -96,13 +86,13 @@ class Engine:
             loss = self.train_subroutine(pair, validation=True)
             avgValidation.add(loss)
 
-        #print(avgTrain)
+        print(avgTrain)
         state = (avgValidation.compute(), avgTrain.compute())
         if state < self._kwargs['best']:
             self._kwargs['best'] = state
             self._kwargs['best_state'] = self.model.state_dict()
 
-        #print(avgValidation)
+        print(avgValidation)
         return state
 
 

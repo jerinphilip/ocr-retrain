@@ -29,14 +29,12 @@ seq_targ_1, seq_targ_2 = loader.split.train[:2]
 print(concat(seq_targ_1, seq_targ_2))
 
 # Test-5 - Reduce using concat, test out
-width = 2**9
+width = 2**15
 from ocr.util import knot
-#train = knot(loader.split.train, max_width=width)
+train = knot(loader.split.train, max_width=width)
+validation = knot(loader.split.val, max_width=width)
 train = loader.split.train
-train = loader.split.train[:1]
-#validation = knot(loader.split.val, max_width=width)
 validation = loader.split.val
-validation = []
 print(train[0][1])
 
 # Test-6 - Convert to gpu ready
@@ -58,7 +56,6 @@ validation_set = convert_gpu(validation)
 #for seq, targ in validation_set:
 #    print("Seq Size, Targ size:", seq.size(), targ.size())
 
-# Test-7 - Test training engine
 from ocr.pytorch.engine import Engine
 satisfactory = False
 savepath = "file.tar"
@@ -75,15 +72,10 @@ except FileNotFoundError:
     }
 
 
+#train_set = train_set[:300]
+#validation_set = validation_set[:30]
+engine = Engine(**kwargs)
 while not satisfactory:
-    engine = Engine(**kwargs)
     val_err, train_err = engine.train(train_set, validation_set, debug=True)
-    kwargs['save'] = engine.export()
+    kwargs = engine.export()
     torch.save(kwargs, open(savepath, "wb+"))
-    #print("Val, Train:", "(%.2lf, %.2lf)"%(val_err, train_err))
-    if val_err < 15.00:
-        width = min(width*2, 2**15)
-        train_set = knot(loader.split.train, max_width=width)
-        validation_set = knot(loader.split.val, max_width=width)
-        train_set = convert_gpu(train)
-        validation_set = convert_gpu(validation)

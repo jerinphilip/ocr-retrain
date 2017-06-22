@@ -45,15 +45,10 @@ convert_gpu = lambda x: list(map(gpu_format(lmap), x))
 train_set = convert_gpu(train)
 validation_set = convert_gpu(validation)
 
-seq, targ = train_set[0]
 
 from ocr.pytorch.coding import Decoder
 decoder = Decoder(lmap, ilmap)
 
-print(decoder.to_string(targ))
-from pprint import pprint
-#pprint(lmap)
-#pprint(ilmap)
 
 from ocr.pytorch.engine import Engine
 satisfactory = False
@@ -71,7 +66,7 @@ except FileNotFoundError:
     }
 
 engine = Engine(**kwargs)
-#print(seq)
-probs = engine.recognize(seq)
-
-decoder.decode(probs)
+for seq, targ in train_set:
+    probs = engine.recognize(seq)
+    string = decoder.decode(probs)
+    print(decoder.to_string(targ)," = ", string)

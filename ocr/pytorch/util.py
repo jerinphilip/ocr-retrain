@@ -5,11 +5,13 @@ from collections import namedtuple
 def gpu_format(label_map):
     def ocr_ready(seq_targ):
         seq, targ = seq_targ
-        seq = torch.Tensor(np.array([seq], dtype=np.float32))
+        seq = torch.Tensor(np.array(seq, dtype=np.float32))
+        seq = seq.unsqueeze(0)
         # The above generates BxHxT - Convert to TxBxH
         seq = seq.permute(2, 0, 1).contiguous() 
         targ = list(map(lambda x: label_map[x], targ))
         targ = torch.IntTensor(targ)
+        print(seq.size(), targ.size())
         return (seq, targ)
     return ocr_ready
 
@@ -112,4 +114,4 @@ class AverageMeter:
         return self.total/self.count
     
     def __str__(self):
-        return "%s (min, max, avg): (%.3lf, %.3lf, %.3lf)"%(self.name, self.max, self.min, self.compute())
+        return "%s (min, avg, max): (%.3lf, %.3lf, %.3lf)"%(self.name, self.min, self.compute(), self.max)
