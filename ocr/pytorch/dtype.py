@@ -1,6 +1,18 @@
 from torch import nn
 
 
+class TimeDistributedDense(nn.Module):
+    def __init__(self, module):                                                 
+        super(TimeDistributedDense, self).__init__()                          
+        self.module = module
+
+    def forward(self, x):
+        timesteps, batch_size = x.size(0), x.size(1)                    
+        x = x.view(batch_size*timesteps, -1)                            
+        x = self.module(x)                                               
+        x = x.view(timesteps, batch_size, -1)                           
+        return x
+
 class GravesBatchRNN(nn.Module):                                        
     def __init__(self, **kwargs):                                                 
         super(GravesBatchRNN, self).__init__()                          
@@ -31,21 +43,14 @@ class GravesNN(nn.Module):
             if key not in kwargs:
                 kwargs[key] = default[key]
 
-        self.fc_in = nn.Linear(kwargs['input_size'], kwargs['hidden_size'])
-        self.fc_out = nn.Linear(kwargs['hidden_size'], kwargs['output_classes'])
+        fc_in = nn.Linear(kwargs['input_size'], kwargs['hidden_size'])
+        fc_out = nn.Linear(kwargs['hidden_size'], kwargs['output_classes'])
+
+        fc_in = TimeDistributedDense(fc_in)
+        fc_out = TimeDistributedDense(fc_out)
+
         hidden_layers = [GravesBatchRNN() for i in range(kwargs['depth'])]             
-        self.hidden = nn.Sequential(*hidden_layers)
+        self.module = nn.Sequential(fc_in, *hidden_layers, fc_out)
 
     def forward(self, x):                                               
-        # Reshaping to handle variable length sequences in FC layer.    
-        timesteps, batch_size = x.size(0), x.size(1)                    
-        x = x.view(batch_size*timesteps, -1)                            
-        x = self.fc_in(x)                                               
-        x = x.view(timesteps, batch_size, -1)                           
-        x = self.hidden(x)                                              
-        # Reshaping to handle variable length sequences in FC layer.    
-        timesteps, batch_size = x.size(0), x.size(1)                    
-        x = x.view(batch_size*timesteps, -1)                            
-        x = self.fc_out(x)                                              
-        x = x.view(timesteps, batch_size, -1)                           
-        return x   
+        return self.module(x)
