@@ -5,30 +5,30 @@ class CostModel:
         self.em = error_module
         suggest = {
             True: 0,
-            False: 0
+            False: 0,
             "name": "suggest"
         }
 
         postproc = {
                 True: 0,
-                False: deepcopy(suggest)
+                False: deepcopy(suggest),
                 "name": "postproc"
         }
 
         ocr = {
             True: deepcopy(postproc),
-            False: deepcopy(postproc)
+            False: deepcopy(postproc),
             "name": "ocr"
         }
 
         self.model = ocr
 
-    def account(prediction, truth):
+    def account(self, prediction, truth):
         threshold = 1
         ocr = (prediction == truth)
-        error = self.em.error(prediction, truth) 
+        error = self.em.error(prediction) 
         pp = (error < threshold)
-        if pp: 
+        if not pp: 
             suggest = (truth in self.em.suggest(prediction))
             self.model[ocr][pp][suggest] += 1
         else:

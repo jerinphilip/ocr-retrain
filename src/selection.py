@@ -6,6 +6,7 @@ def pick_best(**kwargs):
     key = kwargs['key']
     def best_k_key(d):
         return heapq.nlargest(k, d.items(), key=key)
+    return best_k_key
 
 
 def sequential(d_item):

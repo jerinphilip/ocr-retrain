@@ -12,7 +12,7 @@ from functools import partial, reduce
 from math import floor,ceil
 from operator import add
 from cost_model import CostModel
-from timer import Timer
+from timekeep import Timer
 from selection import pick_best
 from selection import sequential, random_index
 
@@ -28,7 +28,7 @@ def extract_words(text):
 def stats(ocr, em, book_locs, book_index):
     timer = Timer(debug=True)
     book_path = book_locs.pop(book_index)
-
+    print(dir(timer))
     timer.start("leave one out vocab")
     full_text = '\n'.join(list(map(webtotrain.full_text, book_locs)))
     words = extract_words(full_text)
@@ -52,7 +52,7 @@ def stats(ocr, em, book_locs, book_index):
     state_dict = {
             "included": {
                 "indices": set()
-            }
+            },
             "excluded": {
                 "indices": set(range(page_count))
             }
@@ -66,6 +66,7 @@ def stats(ocr, em, book_locs, book_index):
 
     n_included = 0
     while (n_included < page_count):
+        em.enhance_vocabulary(running_vocabulary)
         iter_dict = {}
         timer.start("iteration %d"%(n_included))
         for t in ["included", "excluded"]:
@@ -88,8 +89,13 @@ def stats(ocr, em, book_locs, book_index):
         fn = pick_best(count=batchSize, key=sequential)
         promoted = fn(iter_dict["excluded"])
 
-        state_dict["included"]["indices"].add(promoted)
-        state_dict["excluded"]["indices"].remove(promoted)
+        for index, d in promoted:
+            images, truths = pagewise[index]
+            running_vocabulary += truths
+
+            state_dict["included"]["indices"].add(index)
+            state_dict["excluded"]["indices"].remove(index)
+            n_included += 1
 
     return export
 
