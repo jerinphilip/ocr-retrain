@@ -8,8 +8,8 @@ sys.path.insert(0, root)
 
 # Test 1 - Parser
 from parser import read_book
-book = '/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0006/'
-pagewise = read_book(book)
+book = '/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/%s/'%(sys.argv[1])
+pagewise = read_book(book, 'line')
 
 # Test 2 - DataLoader
 from ocr.preproc import DataLoader 

@@ -1,7 +1,6 @@
 import torch
 
 class Decoder:
-
     def __init__(self, lmap, ilmap):
         self.lmap = lmap
         self.ilmap = ilmap

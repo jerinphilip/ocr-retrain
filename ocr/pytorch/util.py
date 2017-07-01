@@ -11,7 +11,6 @@ def gpu_format(label_map):
         seq = seq.permute(2, 0, 1).contiguous() 
         targ = list(map(lambda x: label_map[x], targ))
         targ = torch.IntTensor(targ)
-        print(seq.size(), targ.size())
         return (seq, targ)
     return ocr_ready
 

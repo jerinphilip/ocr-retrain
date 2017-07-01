@@ -9,7 +9,7 @@ class DataLoader:
         self.count = len(self.sequences)
 
         default = {
-                'split': { 'train': 0.6, 'val': 0.2},
+                'split': { 'train': 0.8, 'test': 0.2},
                 'random': False,
         }
         for key in default: 
@@ -38,18 +38,15 @@ class DataLoader:
         train_indices = indices[current:current+train_count]
         current += train_count
 
-        val_count = floor(percent['val']*total)
-        val_indices = indices[current:current+val_count]
-        current += val_count
-
         test_indices = indices[current:]
+
         # Generate namedtuple based on indices. Post Process
-        keys = ['train', 'val', 'test']
+        keys = ['train', 'test']
         SplitDT = namedtuple('split', keys)
 
         ls = []
         get = lambda i: (self.sequences[i], self.targets[i])
         ls.append(list(map(get, train_indices)))
-        ls.append(list(map(get, val_indices)))
         ls.append(list(map(get, test_indices)))
+
         return SplitDT(*ls)

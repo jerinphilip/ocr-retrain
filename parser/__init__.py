@@ -50,7 +50,10 @@ def images_and_truths(udict, mapping_f):
     return result
 
 
-def read_book(book_dir_path, opt_unit='word'):
+def read_book(**kwargs):
+    book_dir_path = kwargs['book_path']
+    opt_unit = kwargs['unit']
+
     obtainxml = lambda f: book_dir_path + f + '.xml'
     filenames = map(obtainxml, ['line', 'word', 'text'])
     lines, words, text = list(map(parse_ocr_xml, filenames))

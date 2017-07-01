@@ -1,4 +1,6 @@
 import numpy as np
+import Levenshtein as lev
+from operator import eq
 
 def concat(seq_targ_1, seq_targ_2, **kwargs):
     """ 
@@ -53,3 +55,19 @@ def knot(ls, **kwargs):
             width = next_width
 
     return knotted
+
+
+def cer(words, truths):
+    sum_edit_dists = sum(map(lev.distance, words, truths))
+    sum_gt_lengths = sum(map(len, truths))
+    fraction = sum_edit_dists/sum_gt_lengths
+    percent = fraction*100
+    return percent
+
+def wer(words, truths):
+    correct = filter(map(eq, words, truths))
+    correct_count = len(correct)
+    total = len(truths)
+    fraction =  correct_count/total
+    percent = fraction*100
+    return percent
