@@ -17,7 +17,7 @@ def sequential(d_item, **kwargs):
 
 
 
-    return index
+  
 
 def random_index(d_item):
     return randint(10000)
