@@ -12,7 +12,6 @@ from parser import read_book
 import json
 from cost_model import CostModel
 from timekeep import Timer
-from selection import pick_best
 from selection import sequential, random_index
 from parser.convert import page_to_unit
 
@@ -36,7 +35,6 @@ def stats(ocr, em, book_locs, book_index):
     timer.start("read images")
     pagewise = read_book(book_path)
     pagewise = pagewise[:7]
-    batchSize = 1
 
     images, truths = page_to_unit(pagewise)
     n_images = len(images)
@@ -68,6 +66,7 @@ def stats(ocr, em, book_locs, book_index):
         em.enhance_vocabulary(running_vocabulary)
         iter_dict = {}
         timer.start("iteration %d"%(n_included))
+
         for t in ["included", "excluded"]:
             iter_dict[t] = {}
             indices = state_dict[t]["indices"]
@@ -78,13 +77,20 @@ def stats(ocr, em, book_locs, book_index):
 
         export["progress"][n_included] = iter_dict
 
+
+        excluded_sample = []
+        for i in iter_dict["excluded"]["indices"]:
+            metric = (i, predictions[i])
+            excluded_sample.append(metric)
+
         # Now add batchSize to the list
+        f = sequential
         batchSize = 1
 
-        fn = pick_best(count=batchSize, key=sequential)
-        promoted = fn(iter_dict["excluded"])
+        promoted = sequential(excluded_sample, count=count)
 
-        for index, d in promoted:
+
+        for index in promoted:
             running_vocabulary.append(truths[index])
             state_dict["included"]["indices"].add(index)
             state_dict["excluded"]["indices"].remove(index)
