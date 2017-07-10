@@ -17,8 +17,9 @@ def pick_best(**kwargs):
         return heapq.nlargest(k, d.items(), key=key)
     return best_k_key
 
-def sequential(d_item, **kwargs):
+def sequential(**kwargs):
 	k = kwargs['count']
+	d_item = kwargs[]
 	indices, predictions = zip(*d_item)
 	k_best = [index for index in indices[:k]] 
 	return k_best
