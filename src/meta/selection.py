@@ -9,10 +9,10 @@ def pick_best(**kwargs):
     return best_k_key
 
 def sequential(d_item, **kwargs):
-	if 'count' in kwargs:
-		k = kwargs['count']
+	
+	k = kwargs['count']
 	indices, predictions = zip(*d_item)
-	k_best = [predictions[index] for index in indices]
+	k_best = [index for index in indices[:k]] 
 	return k_best
 
 
