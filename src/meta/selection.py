@@ -2,13 +2,14 @@ import heapq
 from random import randint
 from collections import Counter
 import random
-
-def pick_most_common(predictions):
+import pdb
+def pick_most_common(predictions,k):
 	wordcount = Counter()
 	for prediction in predictions:
-		wordcount.update(prediction)
-	most_common = [ww[0] for ii, ww in enumerate(wordcount.most_common(10000))]
-	return most_common
+		wordcount.update([prediction])
+
+	most_common_words = [ww[0] for ii, ww in enumerate(wordcount.most_common(k))]
+	return most_common_words
 
 def pick_best(**kwargs):
     k = kwargs['count']
@@ -17,9 +18,8 @@ def pick_best(**kwargs):
         return heapq.nlargest(k, d.items(), key=key)
     return best_k_key
 
-def sequential(**kwargs):
+def sequential(d_item, **kwargs):
 	k = kwargs['count']
-	d_item = kwargs[]
 	indices, predictions = zip(*d_item)
 	k_best = [index for index in indices[:k]] 
 	return k_best
@@ -27,18 +27,33 @@ def sequential(**kwargs):
 
 def random_index(d_item, **kwargs):
 	k = kwargs['count']
+	
 	indices, predictions = zip(*d_item)
 	indices = list(indices)
-	k_best  = random.sample(k, indices)
+	k = min(len(indices),k)
+	k_best  = random.sample(indices, k)
 	return k_best
 
 def word_freqency(d_item, **kwargs):
 	indices, predictions = zip(*d_item)
 	indices, predictions = list(indices), list(predictions)
+	print (len(predictions))
+	print(predictions[:10])
 	k = kwargs['count']
-	most_common = pick_most_common(predictions)
-	k_best = [predictions.index[each_word] for each_word in most_common[:k]]
+	most_common_words = pick_most_common(predictions,k)
+
+	#print (most_common_words)
+	k_best = [predictions.index(each_word) for each_word in most_common_words]
 	return k_best
 
 
-
+def word_frequency_v02(d_item, **kwargs):
+	k = kwargs['count']
+	k_best = []
+	indices, predictions = zip(*d_item)
+	indices, predictions = list(indices), list(predictions)
+	rev_d_item = dict(zip(predictions, indices))
+	#pdb.set_trace()
+	most_common_words = pick_most_common(predictions,k)
+	k_best = [rev_d_item[each_word] for each_word in most_common_words]
+	return(k_best)

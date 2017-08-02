@@ -11,10 +11,10 @@ from postproc.dictionary import Dictionary
 from aux.tokenizer import tokenize
 from parser import read_book
 import json
-#from cost_model import CostModel
+from cost_model import CostModel
 from timekeep import Timer
 from selection import pick_best
-from selection import sequential, random_index
+from selection import sequential, random_index,  word_frequency_v02
 from parser.convert import page_to_unit
 import parser.webtotrain as webtotrain
 import pdb
@@ -38,7 +38,7 @@ def stats(ocr, em, book_locs, book_index):
 
     timer.start("read images")
     pagewise = webtotrain.read_book(book_path)
-    pagewise = pagewise[:4]
+    pagewise = pagewise
     page_count = len(pagewise)
     batchSize = 20
     images, truths = page_to_unit(pagewise)
@@ -48,10 +48,10 @@ def stats(ocr, em, book_locs, book_index):
     timer.end()
     state_dict = {
             "included": {
-                "indices": list()
+                "indices": set()
             },
             "excluded": {
-                "indices": list(range(n_images))
+                "indices": set(range(n_images))
             }
     }
 
@@ -64,26 +64,36 @@ def stats(ocr, em, book_locs, book_index):
     running_vocabulary =[]
     for n_words_included in range(0, n_images, batchSize):
         em.enhance_vocabulary(running_vocabulary)
-        
-        
+        iter_dict = {}
+        timer.start("iteration %d"%(n_words_included))
+
+        for t in ["included", "excluded"]:
+            iter_dict[t] = {}
+            indices = state_dict[t]["indices"]
+            cost_engine = CostModel(em)
+            for i in indices:
+                cost_engine.account(predictions[i], truths[i])
+            iter_dict[t] = cost_engine.export()
+
+        export["progress"][n_words_included] = iter_dict
         
         excluded_sample = []
         for i in state_dict["excluded"]["indices"]:
             metric = (i, predictions[i])
             excluded_sample.append(metric)
-        print(len(excluded_sample))
-        print(excluded_sample[0])
-        promoted = sequential(excluded_sample, count= batchSize)
+        #print(len(excluded_sample))
+        #print(excluded_sample[0])
+        #pdb.set_trace()
+        promoted =  random_index(excluded_sample, count= batchSize)
         for index in promoted:
             running_vocabulary.append(truths[index])
-            #state_dict["included"]["indices"].add(index)
-            #state_dict["excluded"]["indices"].remove(index)
-            state_dict["included"]["indices"].append(index)
+            state_dict["included"]["indices"].add(index)
             state_dict["excluded"]["indices"].remove(index)
-    list(set(state_dict["included"]["indices"]))
-    list(set(state_dict["excluded"]["indices"]))
+           
+
+    
     print("done")      
-    return state_dict
+    return export
 
 
 
@@ -96,7 +106,7 @@ if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
     book_index = int(sys.argv[2])
     lang = sys.argv[3]
-    output_dir = 'outputs'
+    output_dir = 'outputs/random/'
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
