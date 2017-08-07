@@ -1,5 +1,8 @@
 import json
 import sys
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
 
 
 # Global cost parameters.
@@ -56,9 +59,39 @@ def get_xy(d):
         ys.append(projected)
         review_cost += cost_per_unit * batchSize
     return (xs, ys)
+
+def get_xys(fns):
+    pairs = []
+    for fn in fns:
+    return pairs
+        
         
 if __name__ == '__main__':
     d = parse(sys.argv[1])
     xs, ys = get_xy(d)
 
+
+exit()
+#print('Lang,Book,Cost,Error,Word')
+#for lang in ['hi', 'ml']:
+#    saves = []
+#    for dr, drs, fls in os.walk('output/%s'%(lang)):
+#        for fn in fls:
+#            fn_with_path = dr + '/' + fn
+#            saves.append(json.load(open(fn_with_path)))
+#
+#    # words = list(map(get_total_words, saves))
+#    plt.figure(figsize=(20,10))
+#    for save in saves:
+#        xs, ys = get_xs_ys(save)
+#        bname = fmap[lang][extract_bcode(save)]
+#        plt.plot(xs, ys, label=bname)
+#        label_str = "%s, %s"%(bname[:5], save["pages"])
+#        plt.text(xs[-1], ys[-1], label_str)
+#
+#    plt.xlabel("no of pages included in dictionary")
+#    plt.ylabel("estimated cost for entire book")
+#    plt.savefig('output/images/cost-projected-%s.png'%(lang), dpi=300)
+#    plt.clf()
+#
 
