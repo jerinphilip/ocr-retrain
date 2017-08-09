@@ -34,7 +34,7 @@ def stats(ocr, em, book_locs, book_index):
 
     timer.start("read images")
     pagewise = read_book(book_path)
-    pagewise = pagewise[:7]
+    pagewise = pagewise[:2]
 
     images, truths = page_to_unit(pagewise)
     n_images = len(images)
@@ -87,7 +87,7 @@ def stats(ocr, em, book_locs, book_index):
         f = sequential
         batchSize = 1
 
-        promoted = sequential(excluded_sample, count=count)
+        promoted = wf(excluded_sample, count=count)
 
 
         for index in promoted:
@@ -101,8 +101,9 @@ def stats(ocr, em, book_locs, book_index):
 if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
     book_index = int(sys.argv[2])
+    #book_index = [3,4,5,6,12,13]
     lang = sys.argv[3]
-    output_dir = 'srm-27-june'
+    output_dir ='outputs/wf'
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))

@@ -66,7 +66,7 @@ def stats(ocr, em, book_locs, book_index):
         em.enhance_vocabulary(running_vocabulary)
         iter_dict = {}
         timer.start("iteration %d"%(n_words_included))
-
+        print('number of words included %d'%(n_words_included))
         for t in ["included", "excluded"]:
             iter_dict[t] = {}
             indices = state_dict[t]["indices"]
@@ -84,7 +84,8 @@ def stats(ocr, em, book_locs, book_index):
         #print(len(excluded_sample))
         #print(excluded_sample[0])
         #pdb.set_trace()
-        promoted =  random_index(excluded_sample, count= batchSize)
+        promoted =  word_frequency_v02(excluded_sample, count= batchSize)
+
         for index in promoted:
             running_vocabulary.append(truths[index])
             state_dict["included"]["indices"].add(index)
@@ -104,13 +105,14 @@ def stats(ocr, em, book_locs, book_index):
 
 if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
+    #book_index = int(sys.argv[2])
     book_index = int(sys.argv[2])
     lang = sys.argv[3]
-    output_dir = 'outputs/random/'
+    output_dir = 'new_outputs'
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
     stat_d = stats(ocr, error, book_locs, book_index)
-    with open('%s/%s/stats_%s.json'%(output_dir, lang, config["books"][book_index]), 'w+') as fp:
+    with open('%s/%s/wf/stats_%s.json'%(output_dir, lang, config["books"][book_index]), 'w+') as fp:
             json.dump(stat_d, fp, indent=4)
 

@@ -53,7 +53,14 @@ def word_frequency_v02(d_item, **kwargs):
 	indices, predictions = zip(*d_item)
 	indices, predictions = list(indices), list(predictions)
 	rev_d_item = dict(zip(predictions, indices))
-	#pdb.set_trace()
+	
 	most_common_words = pick_most_common(predictions,k)
-	k_best = [rev_d_item[each_word] for each_word in most_common_words]
+	#k_best = [rev_d_item[each_word] for each_word in most_common_words](
+	def subset(pos):
+		sub = [indices[p] for p in pos]
+		return sub
+	for word in most_common_words:
+		pos = [i for i,v in enumerate(predictions) if v == word]
+		k_best.extend(subset(pos))
+	
 	return(k_best)
