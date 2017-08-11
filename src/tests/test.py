@@ -63,7 +63,7 @@ def stats(ocr, em, book_locs, book_index):
     }
     n_words_included = 0
     running_vocabulary =[]
-    for n_words_included in range(0, n_images, batchSize):
+    while n_words_included < n_images:
         em.enhance_vocabulary(running_vocabulary)
         iter_dict = {}
         timer.start("iteration %d"%(n_words_included))
@@ -92,6 +92,8 @@ def stats(ocr, em, book_locs, book_index):
             running_vocabulary.append(truths[index])
             state_dict["included"]["indices"].add(index)
             state_dict["excluded"]["indices"].remove(index)
+
+        n_words_included += len(promoted)
            
 
     
