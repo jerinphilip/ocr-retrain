@@ -35,7 +35,10 @@ def random_index(d_item, **kwargs):
 	return k_best
 
 def word_freqency(d_item, **kwargs):
-	indices, predictions = zip(*d_item)
+	try:
+		indices, predictions = zip(*d_item)
+	except ValueError as e:
+		print('Not enough argument')
 	indices, predictions = list(indices), list(predictions)
 	print (len(predictions))
 	print(predictions[:10])

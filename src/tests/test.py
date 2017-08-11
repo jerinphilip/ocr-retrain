@@ -38,7 +38,8 @@ def stats(ocr, em, book_locs, book_index):
 
     timer.start("read images")
     pagewise = webtotrain.read_book(book_path)
-    pagewise = pagewise
+    num_pages = min(len(pagewise), 75)
+    pagewise = pagewise[:75]
     page_count = len(pagewise)
     batchSize = 20
     images, truths = page_to_unit(pagewise)
@@ -84,7 +85,8 @@ def stats(ocr, em, book_locs, book_index):
         #print(len(excluded_sample))
         #print(excluded_sample[0])
         #pdb.set_trace()
-        promoted =  word_frequency_v02(excluded_sample, count= batchSize)
+        if excluded_sample:
+            promoted =  word_frequency_v02(excluded_sample, count= batchSize)
 
         for index in promoted:
             running_vocabulary.append(truths[index])
