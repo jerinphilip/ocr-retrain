@@ -38,8 +38,8 @@ def stats(ocr, em, book_locs, book_index):
 
     timer.start("read images")
     pagewise = webtotrain.read_book(book_path)
-    num_pages = min(len(pagewise), 75)
-    pagewise = pagewise[:75]
+    num_pages = min(len(pagewise), 50)
+    pagewise = pagewise[:num_pages]
     page_count = len(pagewise)
     batchSize = 20
     images, truths = page_to_unit(pagewise)
