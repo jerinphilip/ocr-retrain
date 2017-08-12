@@ -71,6 +71,12 @@ def group(text_data, atoms):
 
     # Return ultimate dict
     return udict
+def pages(book_dir_path):
+    obtainxml = lambda f: book_dir_path + f + '.xml'
+    filenames = map(obtainxml, ['line', 'word', 'text'])
+    lines, words, text = list(map(parse_ocr_xml, filenames))
+    pno = [entry["PageNo"] for entry in lines]
+    return pno[-1]
 
 def images_and_truths(udict, mapping_f):
     result = []
@@ -111,6 +117,7 @@ def read_book(book_dir_path):
     lines, words, text = list(map(parse_ocr_xml, filenames))
     ud = group(text, words)
     ud["prefix"] = book_dir_path
+    
     pagewise = images_and_truths(ud, word_mapping_f)
     return pagewise
 

@@ -28,6 +28,24 @@ def extract_words(text):
         tokens.extend(valid)
     return tokens
 
+def reorder_books(book_path):
+    book_pages = {}
+    print("processing....")
+    count = 0
+    
+    for book in book_path:
+        count += 1
+        book_name = book.split('/')[-2]
+        book_pages[book_name] = webtotrain.pages(book)
+        print (book_name)
+
+    print('book lengths stored')
+    k, v = zip(*[item for item in book_pages.items()])
+    rev_my_dict = dict(zip(v, k))
+    list1 = [rev_my_dict[k] for k in sorted(rev_my_dict.keys())]
+    return(list1)
+
+
 def stats(ocr, em, book_locs, book_index):
     timer = Timer(debug=True)
     book_path = book_locs.pop(book_index)
@@ -38,10 +56,10 @@ def stats(ocr, em, book_locs, book_index):
 
     timer.start("read images")
     pagewise = webtotrain.read_book(book_path)
-    num_pages = min(len(pagewise), 50)
-    pagewise = pagewise[:num_pages]
+    #num_pages = min(len(pagewise), 10)
+    #pagewise = pagewise
     page_count = len(pagewise)
-    batchSize = 20
+    batchSize = 1000
     images, truths = page_to_unit(pagewise)
     n_images = len(images)
     timer.start("ocr, recognize")
@@ -86,7 +104,7 @@ def stats(ocr, em, book_locs, book_index):
         #print(excluded_sample[0])
         #pdb.set_trace()
         if excluded_sample:
-            promoted =  word_frequency_v02(excluded_sample, count= batchSize)
+            promoted =  random_index(excluded_sample, count= batchSize)
 
         for index in promoted:
             running_vocabulary.append(truths[index])
@@ -116,7 +134,14 @@ if __name__ == '__main__':
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
-    stat_d = stats(ocr, error, book_locs, book_index)
-    with open('%s/%s/wf/stats_%s.json'%(output_dir, lang, config["books"][book_index]), 'w+') as fp:
-            json.dump(stat_d, fp, indent=4)
+    order = reorder_books(book_locs)
+    index = order.index(order[book_index])
+    stat_d = stats(ocr, error, book_locs, index)
+    
+    #stat_d = stats(ocr, error, book_locs, book_index)
+    #with open('%s/%s/wf/stats_%s.json'%(output_dir, lang, config["books"][book_index]), 'w+') as fp:
+    #        json.dump(stat_d, fp, indent=4)
+    with open('%s/%s/random/stats_%s.json'%(output_dir, lang, order[book_index]), 'w+') as fp:
+           json.dump(stat_d, fp, indent=4)
+
 
