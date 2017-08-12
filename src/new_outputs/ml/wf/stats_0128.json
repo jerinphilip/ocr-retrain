@@ -1,0 +1,182 @@
+{
+    "units": 5555,
+    "book_dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0128/",
+    "progress": {
+        "0": {
+            "included": {
+                "true": {
+                    "true": 0,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 0,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3041,
+                    "false": {
+                        "true": 462,
+                        "false": 1871,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 17,
+                    "false": {
+                        "true": 22,
+                        "false": 142,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "2844": {
+            "included": {
+                "true": {
+                    "true": 2787,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 16,
+                    "false": {
+                        "true": 21,
+                        "false": 20,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 972,
+                    "false": {
+                        "true": 303,
+                        "false": 1312,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 9,
+                    "false": {
+                        "true": 15,
+                        "false": 100,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "3844": {
+            "included": {
+                "true": {
+                    "true": 3720,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 22,
+                    "false": {
+                        "true": 56,
+                        "false": 46,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 637,
+                    "false": {
+                        "true": 197,
+                        "false": 820,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 3,
+                    "false": {
+                        "true": 8,
+                        "false": 46,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "4844": {
+            "included": {
+                "true": {
+                    "true": 4695,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 23,
+                    "false": {
+                        "true": 72,
+                        "false": 54,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 259,
+                    "false": {
+                        "true": 77,
+                        "false": 343,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 2,
+                    "false": {
+                        "true": 4,
+                        "false": 26,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        }
+    }
+}

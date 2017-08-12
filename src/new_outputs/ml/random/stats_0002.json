@@ -1,0 +1,754 @@
+{
+    "units": 16633,
+    "book_dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0009/",
+    "progress": {
+        "0": {
+            "included": {
+                "true": {
+                    "true": 0,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 0,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 10515,
+                    "false": {
+                        "true": 640,
+                        "false": 5064,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 80,
+                    "false": {
+                        "true": 68,
+                        "false": 266,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "1000": {
+            "included": {
+                "true": {
+                    "true": 972,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 9,
+                    "false": {
+                        "true": 11,
+                        "false": 8,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 10156,
+                    "false": {
+                        "true": 580,
+                        "false": 4511,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 73,
+                    "false": {
+                        "true": 66,
+                        "false": 247,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "2000": {
+            "included": {
+                "true": {
+                    "true": 1952,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 13,
+                    "false": {
+                        "true": 20,
+                        "false": 15,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 9620,
+                    "false": {
+                        "true": 531,
+                        "false": 4116,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 69,
+                    "false": {
+                        "true": 66,
+                        "false": 231,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "3000": {
+            "included": {
+                "true": {
+                    "true": 2934,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 16,
+                    "false": {
+                        "true": 25,
+                        "false": 25,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 9055,
+                    "false": {
+                        "true": 476,
+                        "false": 3754,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 66,
+                    "false": {
+                        "true": 65,
+                        "false": 217,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "4000": {
+            "included": {
+                "true": {
+                    "true": 3911,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 19,
+                    "false": {
+                        "true": 36,
+                        "false": 34,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 8458,
+                    "false": {
+                        "true": 433,
+                        "false": 3417,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 64,
+                    "false": {
+                        "true": 59,
+                        "false": 202,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "5000": {
+            "included": {
+                "true": {
+                    "true": 4881,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 24,
+                    "false": {
+                        "true": 52,
+                        "false": 43,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 7810,
+                    "false": {
+                        "true": 382,
+                        "false": 3146,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 59,
+                    "false": {
+                        "true": 50,
+                        "false": 186,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "6000": {
+            "included": {
+                "true": {
+                    "true": 5854,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 30,
+                    "false": {
+                        "true": 67,
+                        "false": 49,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 7187,
+                    "false": {
+                        "true": 336,
+                        "false": 2842,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 54,
+                    "false": {
+                        "true": 46,
+                        "false": 168,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "7000": {
+            "included": {
+                "true": {
+                    "true": 6835,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 33,
+                    "false": {
+                        "true": 81,
+                        "false": 51,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 6530,
+                    "false": {
+                        "true": 302,
+                        "false": 2552,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 51,
+                    "false": {
+                        "true": 41,
+                        "false": 157,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "8000": {
+            "included": {
+                "true": {
+                    "true": 7810,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 35,
+                    "false": {
+                        "true": 93,
+                        "false": 62,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 5839,
+                    "false": {
+                        "true": 274,
+                        "false": 2296,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 49,
+                    "false": {
+                        "true": 37,
+                        "false": 138,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "9000": {
+            "included": {
+                "true": {
+                    "true": 8785,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 40,
+                    "false": {
+                        "true": 104,
+                        "false": 71,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 5181,
+                    "false": {
+                        "true": 232,
+                        "false": 2021,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 46,
+                    "false": {
+                        "true": 31,
+                        "false": 122,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "10000": {
+            "included": {
+                "true": {
+                    "true": 9757,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 49,
+                    "false": {
+                        "true": 114,
+                        "false": 80,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 4533,
+                    "false": {
+                        "true": 189,
+                        "false": 1740,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 37,
+                    "false": {
+                        "true": 27,
+                        "false": 107,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "11000": {
+            "included": {
+                "true": {
+                    "true": 10724,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 59,
+                    "false": {
+                        "true": 122,
+                        "false": 95,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3865,
+                    "false": {
+                        "true": 159,
+                        "false": 1471,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 27,
+                    "false": {
+                        "true": 22,
+                        "false": 89,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "12000": {
+            "included": {
+                "true": {
+                    "true": 11695,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 64,
+                    "false": {
+                        "true": 137,
+                        "false": 104,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3207,
+                    "false": {
+                        "true": 131,
+                        "false": 1186,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 22,
+                    "false": {
+                        "true": 17,
+                        "false": 70,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "13000": {
+            "included": {
+                "true": {
+                    "true": 12672,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 68,
+                    "false": {
+                        "true": 147,
+                        "false": 113,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 2498,
+                    "false": {
+                        "true": 96,
+                        "false": 953,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 19,
+                    "false": {
+                        "true": 14,
+                        "false": 53,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "14000": {
+            "included": {
+                "true": {
+                    "true": 13649,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 72,
+                    "false": {
+                        "true": 156,
+                        "false": 123,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1810,
+                    "false": {
+                        "true": 68,
+                        "false": 692,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 16,
+                    "false": {
+                        "true": 9,
+                        "false": 38,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "15000": {
+            "included": {
+                "true": {
+                    "true": 14625,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 80,
+                    "false": {
+                        "true": 161,
+                        "false": 134,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1146,
+                    "false": {
+                        "true": 43,
+                        "false": 405,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 10,
+                    "false": {
+                        "true": 8,
+                        "false": 21,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "16000": {
+            "included": {
+                "true": {
+                    "true": 15600,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 87,
+                    "false": {
+                        "true": 173,
+                        "false": 140,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 437,
+                    "false": {
+                        "true": 18,
+                        "false": 164,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 4,
+                    "false": {
+                        "true": 1,
+                        "false": 9,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        }
+    }
+}

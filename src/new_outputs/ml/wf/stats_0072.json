@@ -1,0 +1,930 @@
+{
+    "units": 46706,
+    "book_dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0072/",
+    "progress": {
+        "0": {
+            "included": {
+                "true": {
+                    "true": 0,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 0,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 25015,
+                    "false": {
+                        "true": 3671,
+                        "false": 16606,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 140,
+                    "false": {
+                        "true": 331,
+                        "false": 943,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "21228": {
+            "included": {
+                "true": {
+                    "true": 21109,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 70,
+                    "false": {
+                        "true": 42,
+                        "false": 7,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 9127,
+                    "false": {
+                        "true": 2659,
+                        "false": 12397,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 94,
+                    "false": {
+                        "true": 405,
+                        "false": 796,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "25123": {
+            "included": {
+                "true": {
+                    "true": 24942,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 93,
+                    "false": {
+                        "true": 81,
+                        "false": 7,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 6598,
+                    "false": {
+                        "true": 2239,
+                        "false": 11513,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 76,
+                    "false": {
+                        "true": 381,
+                        "false": 776,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "27563": {
+            "included": {
+                "true": {
+                    "true": 27325,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 111,
+                    "false": {
+                        "true": 110,
+                        "false": 17,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 5308,
+                    "false": {
+                        "true": 1936,
+                        "false": 10723,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 65,
+                    "false": {
+                        "true": 360,
+                        "false": 751,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "29563": {
+            "included": {
+                "true": {
+                    "true": 29277,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 125,
+                    "false": {
+                        "true": 138,
+                        "false": 23,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 4459,
+                    "false": {
+                        "true": 1644,
+                        "false": 9912,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 61,
+                    "false": {
+                        "true": 336,
+                        "false": 731,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "31011": {
+            "included": {
+                "true": {
+                    "true": 30682,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 133,
+                    "false": {
+                        "true": 164,
+                        "false": 32,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3874,
+                    "false": {
+                        "true": 1459,
+                        "false": 9277,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 54,
+                    "false": {
+                        "true": 327,
+                        "false": 704,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "32011": {
+            "included": {
+                "true": {
+                    "true": 31599,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 137,
+                    "false": {
+                        "true": 214,
+                        "false": 61,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3539,
+                    "false": {
+                        "true": 1414,
+                        "false": 8740,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 50,
+                    "false": {
+                        "true": 317,
+                        "false": 635,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "33011": {
+            "included": {
+                "true": {
+                    "true": 32510,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 143,
+                    "false": {
+                        "true": 266,
+                        "false": 92,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3268,
+                    "false": {
+                        "true": 1365,
+                        "false": 8149,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 44,
+                    "false": {
+                        "true": 304,
+                        "false": 565,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "34011": {
+            "included": {
+                "true": {
+                    "true": 33431,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 150,
+                    "false": {
+                        "true": 302,
+                        "false": 128,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 3019,
+                    "false": {
+                        "true": 1283,
+                        "false": 7559,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 37,
+                    "false": {
+                        "true": 287,
+                        "false": 510,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "35011": {
+            "included": {
+                "true": {
+                    "true": 34391,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 151,
+                    "false": {
+                        "true": 329,
+                        "false": 140,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 2779,
+                    "false": {
+                        "true": 1175,
+                        "false": 6947,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 36,
+                    "false": {
+                        "true": 275,
+                        "false": 483,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "36011": {
+            "included": {
+                "true": {
+                    "true": 35346,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 153,
+                    "false": {
+                        "true": 357,
+                        "false": 155,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 2550,
+                    "false": {
+                        "true": 1074,
+                        "false": 6322,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 34,
+                    "false": {
+                        "true": 263,
+                        "false": 452,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "37011": {
+            "included": {
+                "true": {
+                    "true": 36284,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 154,
+                    "false": {
+                        "true": 401,
+                        "false": 172,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 2292,
+                    "false": {
+                        "true": 972,
+                        "false": 5744,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 33,
+                    "false": {
+                        "true": 241,
+                        "false": 413,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "38011": {
+            "included": {
+                "true": {
+                    "true": 37197,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 157,
+                    "false": {
+                        "true": 453,
+                        "false": 204,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 2069,
+                    "false": {
+                        "true": 872,
+                        "false": 5154,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 30,
+                    "false": {
+                        "true": 211,
+                        "false": 359,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "39011": {
+            "included": {
+                "true": {
+                    "true": 38115,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 160,
+                    "false": {
+                        "true": 505,
+                        "false": 231,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1850,
+                    "false": {
+                        "true": 771,
+                        "false": 4556,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 27,
+                    "false": {
+                        "true": 183,
+                        "false": 308,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "40011": {
+            "included": {
+                "true": {
+                    "true": 39047,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 166,
+                    "false": {
+                        "true": 541,
+                        "false": 257,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1649,
+                    "false": {
+                        "true": 690,
+                        "false": 3906,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 21,
+                    "false": {
+                        "true": 166,
+                        "false": 263,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "41011": {
+            "included": {
+                "true": {
+                    "true": 39975,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 168,
+                    "false": {
+                        "true": 588,
+                        "false": 280,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1437,
+                    "false": {
+                        "true": 599,
+                        "false": 3281,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 19,
+                    "false": {
+                        "true": 139,
+                        "false": 220,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "42011": {
+            "included": {
+                "true": {
+                    "true": 40891,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 176,
+                    "false": {
+                        "true": 641,
+                        "false": 303,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1233,
+                    "false": {
+                        "true": 507,
+                        "false": 2661,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 11,
+                    "false": {
+                        "true": 109,
+                        "false": 174,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "43011": {
+            "included": {
+                "true": {
+                    "true": 41811,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 179,
+                    "false": {
+                        "true": 693,
+                        "false": 328,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 1020,
+                    "false": {
+                        "true": 403,
+                        "false": 2058,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 8,
+                    "false": {
+                        "true": 75,
+                        "false": 131,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "44011": {
+            "included": {
+                "true": {
+                    "true": 42761,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 181,
+                    "false": {
+                        "true": 726,
+                        "false": 343,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 727,
+                    "false": {
+                        "true": 291,
+                        "false": 1513,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 6,
+                    "false": {
+                        "true": 66,
+                        "false": 92,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "45011": {
+            "included": {
+                "true": {
+                    "true": 43695,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 182,
+                    "false": {
+                        "true": 781,
+                        "false": 353,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 463,
+                    "false": {
+                        "true": 188,
+                        "false": 946,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 5,
+                    "false": {
+                        "true": 34,
+                        "false": 59,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        },
+        "46011": {
+            "included": {
+                "true": {
+                    "true": 44637,
+                    "false": {
+                        "true": 0,
+                        "false": 0,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 184,
+                    "false": {
+                        "true": 819,
+                        "false": 371,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            },
+            "excluded": {
+                "true": {
+                    "true": 185,
+                    "false": {
+                        "true": 96,
+                        "false": 374,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "false": {
+                    "true": 3,
+                    "false": {
+                        "true": 15,
+                        "false": 22,
+                        "name": "suggest"
+                    },
+                    "name": "postproc"
+                },
+                "name": "ocr"
+            }
+        }
+    }
+}
