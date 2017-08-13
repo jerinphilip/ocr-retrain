@@ -46,7 +46,7 @@ def reorder_books(book_path):
     return(list1)
 
 
-def stats(ocr, em, book_locs, book_index):
+def stats(ocr, em, book_locs, book_index, method):
     timer = Timer(debug=True)
     book_path = book_locs.pop(book_index)
     timer.start("leave one out vocab")
@@ -100,11 +100,9 @@ def stats(ocr, em, book_locs, book_index):
         for i in state_dict["excluded"]["indices"]:
             metric = (i, predictions[i])
             excluded_sample.append(metric)
-        #print(len(excluded_sample))
-        #print(excluded_sample[0])
-        #pdb.set_trace()
+        
         if excluded_sample:
-            promoted =  random_index(excluded_sample, count= batchSize)
+            promoted =  method(excluded_sample, count= batchSize)
 
         for index in promoted:
             running_vocabulary.append(truths[index])
@@ -130,18 +128,28 @@ if __name__ == '__main__':
     #book_index = int(sys.argv[2])
     book_index = int(sys.argv[2])
     lang = sys.argv[3]
+    method_input = sys.argv[4]
+    method_dict = {'sequential': 'sequential', 'random': 'random_index', 'wf': 'word_frequency_v02'}
     output_dir = 'new_outputs'
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
     order = reorder_books(book_locs)
     index = order.index(order[book_index])
-    stat_d = stats(ocr, error, book_locs, index)
+    if method_input == 'sequential':
+        method = method_dict['sequential']
+    elif method_input == 'random':
+        method = method_dict['random']
+    elif method_input == 'wf':
+        method = method_dict['wf']
+    stat_d = stats(ocr, error, book_locs, index, method)
     
     #stat_d = stats(ocr, error, book_locs, book_index)
     #with open('%s/%s/wf/stats_%s.json'%(output_dir, lang, config["books"][book_index]), 'w+') as fp:
     #        json.dump(stat_d, fp, indent=4)
-    with open('%s/%s/random/stats_%s.json'%(output_dir, lang, order[book_index]), 'w+') as fp:
+    with open('%s/%s/%s/stats_%s.json'%(output_dir, lang, method, order[book_index]), 'w+') as fp:
            json.dump(stat_d, fp, indent=4)
+
+
 
 
