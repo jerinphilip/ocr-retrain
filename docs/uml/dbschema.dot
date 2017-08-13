@@ -1,0 +1,30 @@
+digraph schema {
+    node [shape=record]
+    rankdir="BT";
+
+    // Entities
+    book_meta [label="<f0> BookId|<f1> Name | <f2> Lang|<f3> Path"];
+    img_meta [label="<f0> BookId | <f1> ImgId"];
+    crop_meta [label="<f0> CropId|<f1> BookId |<f2> ImgId | <f2> Index or Bbox"];
+    img_temp_meta [label="<f0> ImgId |<f1> TempSave"];
+    recognized [label="<f0> CropId |<f1> ModelId  | <f2> RecogId | <f3> Recognized"];
+    models [label="<f0> ModelId | <f1> SavePath | <f2> Lang"];
+    langs [label="<f0> Lang | <f1> Language"];
+    postproc [label="<f0> PostProcId | <f1> Lang | <f3> ..."];
+    suggested [label="<f0> RecogId | <f1> PostProcId | <f2> Rank | <f3> Suggestion"]
+    reviewed [label="<f0> CropId | <f2> Ground Truth"];
+
+    // Relations
+    crop_meta:f1 -> book_meta:f0;
+    recognized:f0 -> crop_meta:f0;
+    crop_meta:f2 -> img_meta:f1;
+    img_temp_meta:f0 -> img_meta:f1;
+    recognized:f1 -> models:f0;
+    models:f2 -> langs:f0;
+    img_meta:f0 -> book_meta:f0;
+    postproc:f1 -> langs:f0;
+    suggested:f0 -> recognized:f2;
+    suggested:f1 -> postproc:f0;
+    reviewed:f0 -> recognized:f0;
+    book_meta:f2 -> langs:f0;
+}
