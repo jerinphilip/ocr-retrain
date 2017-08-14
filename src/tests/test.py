@@ -8,13 +8,12 @@ sys.path.insert(0, '../src/meta/')
 from ocr import GravesOCR
 
 from postproc.dictionary import Dictionary
-from aux.tokenizer import tokenize
 from parser import read_book
 import json
 from cost_model import CostModel
 from timekeep import Timer
 from selection import pick_best
-from selection import sequential, random_index,  word_frequency_v02
+from selection import sequential, random_index,  word_frequency
 from parser.convert import page_to_unit
 import parser.webtotrain as webtotrain
 from parser.nlp import extract_words
@@ -31,11 +30,11 @@ def simulate(ocr, em, book_locs, book_index):
     pagewise = webtotrain.read_book(book_path)
 
     # Comment if main run.
-    num_pages = min(len(pagewise), 10)
-    pagewise = pagewise[:num_pages]
+    #num_pages = min(len(pagewise), 10)
+    #pagewise = pagewise[:num_pages]
 
     page_count = len(pagewise)
-    batchSize = 1000
+    batchSize = 300
     images, truths = page_to_unit(pagewise)
     n_images = len(images)
     timer.start("ocr, recognize")
@@ -86,8 +85,8 @@ def simulate(ocr, em, book_locs, book_index):
                 metric = (i, predictions[i])
                 excluded_sample.append(metric)
             
-            promoted =  method(excluded_sample, count= batchSize)
-            progress["delta"] = promoted
+            promoted =  fn(excluded_sample, count=batchSize)
+            progress[n_words_included]["delta"] = promoted
 
             for index in promoted:
                 running_vocabulary.append(truths[index])
@@ -103,13 +102,12 @@ if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
     book_index = int(sys.argv[2])
     lang = sys.argv[3]
-    method_input = sys.argv[4]
     output_dir = 'new_outputs'
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
-    stat_d = stats(ocr, error, book_locs, index)
-    with open('%s/%s/%s/stats_%s.json'%(output_dir, lang, method, order[book_index]), 'w+') as fp:
+    stat_d = simulate(ocr, error, book_locs, book_index)
+    with open('outputs/%s/stats_%s.json'%(lang,  config["books"][book_index]), 'w+') as fp:
            json.dump(stat_d, fp, indent=4)
 
 
