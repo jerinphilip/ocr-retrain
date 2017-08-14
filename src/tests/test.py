@@ -76,6 +76,7 @@ def simulate(ocr, em, book_locs, book_index, method):
             excluded_sample.append(metric)
         
         promoted =  method(excluded_sample, count= batchSize)
+        export["progress"]["delta"] = promoted
 
         for index in promoted:
             running_vocabulary.append(truths[index])
@@ -84,7 +85,6 @@ def simulate(ocr, em, book_locs, book_index, method):
             
         n_words_included += len(promoted)
         export["progress"]["delta"] = promoted
-           
 
     return export
 
