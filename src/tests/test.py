@@ -17,36 +17,9 @@ from selection import pick_best
 from selection import sequential, random_index,  word_frequency_v02
 from parser.convert import page_to_unit
 import parser.webtotrain as webtotrain
-import pdb
+from parser.nlp import extract_words
 
-def extract_words(text):
-    tokens = []
-    lines = text.splitlines()
-    for line in lines:
-        candidates = tokenize(line)
-        valid = filter(lambda x:x, candidates)
-        tokens.extend(valid)
-    return tokens
-
-def reorder_books(book_path):
-    book_pages = {}
-    print("processing....")
-    count = 0
-    
-    for book in book_path:
-        count += 1
-        book_name = book.split('/')[-2]
-        book_pages[book_name] = webtotrain.pages(book)
-        print (book_name)
-
-    print('book lengths stored')
-    k, v = zip(*[item for item in book_pages.items()])
-    rev_my_dict = dict(zip(v, k))
-    list1 = [rev_my_dict[k] for k in sorted(rev_my_dict.keys())]
-    return(list1)
-
-
-def stats(ocr, em, book_locs, book_index, method):
+def simulate(ocr, em, book_locs, book_index, method):
     timer = Timer(debug=True)
     book_path = book_locs.pop(book_index)
     timer.start("leave one out vocab")
@@ -79,6 +52,7 @@ def stats(ocr, em, book_locs, book_index, method):
             "book_dir": book_path,
             "progress": {}
     }
+
     n_words_included = 0
     running_vocabulary =[]
     while n_words_included < n_images:
@@ -95,37 +69,27 @@ def stats(ocr, em, book_locs, book_index, method):
             iter_dict[t] = cost_engine.export()
 
         export["progress"][n_words_included] = iter_dict
-        
         excluded_sample = []
+
         for i in state_dict["excluded"]["indices"]:
             metric = (i, predictions[i])
             excluded_sample.append(metric)
         
-        if excluded_sample:
-            promoted =  method(excluded_sample, count= batchSize)
+        promoted =  method(excluded_sample, count= batchSize)
+        export["progress"]["delta"] = promoted
 
         for index in promoted:
             running_vocabulary.append(truths[index])
             state_dict["included"]["indices"].add(index)
             state_dict["excluded"]["indices"].remove(index)
-
+            
         n_words_included += len(promoted)
-           
 
-    
-    print("done")      
     return export
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
-    #book_index = int(sys.argv[2])
     book_index = int(sys.argv[2])
     lang = sys.argv[3]
     method_input = sys.argv[4]
