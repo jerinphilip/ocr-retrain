@@ -34,7 +34,7 @@ def simulate(ocr, em, book_locs, book_index):
     #pagewise = pagewise[:num_pages]
 
     page_count = len(pagewise)
-    batchSize = 300
+    batchSize = 500
     images, truths = page_to_unit(pagewise)
     n_images = len(images)
     timer.start("ocr, recognize")
@@ -68,9 +68,20 @@ def simulate(ocr, em, book_locs, book_index):
         while n_words_included < n_images:
             em.enhance_vocabulary(running_vocabulary)
             iter_dict = {}
+            excluded_sample = []
+
+            for i in state_dict["excluded"]["indices"]:
+                metric = (i, predictions[i])
+                excluded_sample.append(metric)
+            
+            promoted =  fn(excluded_sample, count=batchSize)
+            state_dict["promoted"] = {}
+            state_dict["promoted"]["indices"] = promoted
+
+
             timer.start("iteration %d"%(n_words_included))
             print('number of words included %d'%(n_words_included))
-            for t in ["included", "excluded"]:
+            for t in ["included", "excluded", "promoted"]:
                 iter_dict[t] = {}
                 indices = state_dict[t]["indices"]
                 cost_engine = CostModel(em)
@@ -79,14 +90,6 @@ def simulate(ocr, em, book_locs, book_index):
                 iter_dict[t] = cost_engine.export()
 
             progress[n_words_included] = iter_dict
-            excluded_sample = []
-
-            for i in state_dict["excluded"]["indices"]:
-                metric = (i, predictions[i])
-                excluded_sample.append(metric)
-            
-            promoted =  fn(excluded_sample, count=batchSize)
-            progress[n_words_included]["delta"] = promoted
 
             for index in promoted:
                 running_vocabulary.append(truths[index])
@@ -94,7 +97,6 @@ def simulate(ocr, em, book_locs, book_index):
                 state_dict["excluded"]["indices"].remove(index)
                 
             n_words_included += len(promoted)
-            progress["delta"] = promoted
         export[strategy] = progress
     return export
 
