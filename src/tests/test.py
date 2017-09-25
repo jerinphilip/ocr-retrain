@@ -78,10 +78,10 @@ def simulate(ocr, em, book_locs, book_index):
             state_dict["promoted"] = {}
             state_dict["promoted"]["indices"] = promoted
 
-
             timer.start("iteration %d"%(n_words_included))
             print('number of words included %d'%(n_words_included))
-            for t in ["included", "excluded", "promoted"]:
+            #for t in ["included", "excluded", "promoted"]:
+            for t in ["excluded", "promoted"]:
                 iter_dict[t] = {}
                 indices = state_dict[t]["indices"]
                 cost_engine = CostModel(em)
@@ -91,14 +91,32 @@ def simulate(ocr, em, book_locs, book_index):
 
             progress[n_words_included] = iter_dict
 
-            for index in promoted:
-                running_vocabulary.append(truths[index])
-                state_dict["included"]["indices"].add(index)
-                state_dict["excluded"]["indices"].remove(index)
+            promoted_final = set()
+            for meta_index in promoted:
+                # One pass to get all similar words
+                indices = find_indices(truths, truths[meta_index])
+                for index in indices:
+                    try:
+                        state_dict["included"]["indices"].add(index)
+                        state_dict["excluded"]["indices"].remove(index)
+                    except KeyError:
+                        #print("Not found key", index)
+                        pass
+                    promoted_final.add(index)
                 
-            n_words_included += len(promoted)
+            state_dict["promoted"]["scanned_indices"] = promoted
+            n_words_included += len(promoted_final)
         export[strategy] = progress
     return export
+
+def find_indices(ls, key):
+    indices = []
+    for i, x in enumerate(ls):
+        if x == key:
+            indices.append(i)
+    return indices
+
+
 
 if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
@@ -111,7 +129,3 @@ if __name__ == '__main__':
     stat_d = simulate(ocr, error, book_locs, book_index)
     with open('outputs/%s/stats_%s.json'%(lang,  config["books"][book_index]), 'w+') as fp:
            json.dump(stat_d, fp, indent=4)
-
-
-
-
