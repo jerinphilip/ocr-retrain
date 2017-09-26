@@ -1,119 +1,116 @@
 import sys
 import os
+import json
 
 # Insert, so root-dir remains clean
-from ocr import GravesOCR
-from postproc.dictionary import Dictionary
-from parser import read_book
-import json
-from cost_model import CostModel
-from timekeep import Timer
-from selection import pick_best
-from selection import sequential, random_index,  word_frequency
-from parser.convert import page_to_unit
-import parser.webtotrain as webtotrain
-from parser.nlp import extract_words
+from docutils.ocr import GravesOCR
+from docutils.postproc.dictionary import Dictionary
+from docutils.parser import read_book
+from docutils.meta.cost_model import CostModel
+from docutils.meta.timekeep import Timer
+from docutils.meta.selection import sequential, random_index,  word_frequency
+from docutils.parser.convert import page_to_unit
+import docutils.parser.webtotrain as webtotrain
+from docutils.parser.nlp import extract_words
 
-def simulate(ocr, em, book_locs, book_index):
-    timer = Timer(debug=True)
-    book_path = book_locs.pop(book_index)
-    timer.start("leave one out vocab")
-    full_text = '\n'.join(list(map(webtotrain.full_text, book_locs)))
-    words = extract_words(full_text)
-    em.enhance_vocab_with_books(words)
+class Simulator:
+    def __init__(self, **kwargs):
+        self.ocr = kwargs['ocr']
+        self.em = kwargs['postproc']
+        self.fpaths = kwargs['books']
+        self.batch_size = kwargs['batch_size']
+        self.strategies = [
+            ("random", random_index),
+            ("sequential", sequential),
+            ("frequency", word_frequency)
+        ]
+        self.t = 0
+        self.export = {}
+        self.initialize_state()
 
-    timer.start("read images")
-    pagewise = webtotrain.read_book(book_path)
+    def initialize_state(self):
+        self.state = {}
+        for strategy, fn in self.strategies:
+            self.state[strategy] = State(strategy=fn, 
+                    predictions=self.predictions)
 
-    # Comment if main run.
-    #num_pages = min(len(pagewise), 10)
-    #pagewise = pagewise[:num_pages]
+    def leave_one_out(self, index):
+        self.index = index
+        self.load_vocabulary()
 
-    page_count = len(pagewise)
-    batchSize = 500
-    images, truths = page_to_unit(pagewise)
-    n_images = len(images)
-    timer.start("ocr, recognize")
-    predictions = [ocr.recognize(image) for image in images]
-    timer.end()
+    def load_vocabulary(self):
+        words = []
+        for i, fpath in enumerate(self.fpaths):
+            if i != self.index:
+                text = webtotrain.full_text(fpath)
+                bwords = extract_words(text)
+                words.append(bwords)
+        self.em.enhance_vocab_with_books(words)
 
-    strategies = [
-        ("random", random_index),
-        ("sequential", sequential),
-        ("frequency", word_frequency)
-    ]
+    def recognize(self):
+        fpath = self.fpaths[self.index]
+        pagewise = webtotrain.read_book(fpath)
+        if self.debug:
+            pagewise = pagewise[5:10]
+        images, self.truths = page_to_unit(pagewise)
+        self.predictions = [ self.ocr.recognize(image) \
+                             for image in images ]
+        
 
-    export = {
-            "units": n_images,
-            "book_dir": book_path,
-    }
+    def postprocess(self):
+        self.export = {}
+        for strategy, fn in self.strategies:
+            self.vocabulary = []
+            self.export[strategy] = {}
+            for state in self.state[strategy]:
+                delta = state.export()
+                print(delta)
 
-    for strategy, fn in strategies:
-        progress = {}
-        state_dict = {
-                "included": {
-                    "indices": set()
-                },
-                "excluded": {
-                    "indices": set(range(n_images))
-                }
+
+class State:
+    def __init__(self, **kw):
+        self.included = set()
+        self.excluded = set(list(range(kw['count'])))
+        self.strategy = kw['strategy']
+        self.predictions = kwargs['predictions']
+        self.best = []
+        self.promoted = set()
+
+    def export(self):
+        state = {
+           # "included": self.included,
+           # "excluded": self.excluded,
+            "best": self.best,
+            "promoted": self.promoted,
         }
+        return state
 
-        n_words_included = 0
-        running_vocabulary =[]
-        while n_words_included < n_images:
-            em.enhance_vocabulary(running_vocabulary)
-            iter_dict = {}
-            excluded_sample = []
+    def __iter__(self):
+        return self
 
-            for i in state_dict["excluded"]["indices"]:
-                metric = (i, predictions[i])
-                excluded_sample.append(metric)
-            
-            promoted =  fn(excluded_sample, count=batchSize)
-            state_dict["promoted"] = {}
-            state_dict["promoted"]["indices"] = promoted
+    def __next__(self):
+        if not self.excluded:
+            raise StopIteration()
+        self.promote()
+        return self
 
-            timer.start("iteration %d"%(n_words_included))
-            print('number of words included %d'%(n_words_included))
-            #for t in ["included", "excluded", "promoted"]:
-            promoted_final = set()
-            for meta_index in promoted:
-                # One pass to get all similar words
-                indices = find_indices(truths, truths[meta_index])
-                for index in indices:
-                    try:
-                        state_dict["included"]["indices"].add(index)
-                        running_vocabulary.append(truths[index])
-                        state_dict["excluded"]["indices"].remove(index)
-                    except KeyError:
-                        #print("Not found key", index)
-                        pass
-                    promoted_final.add(index)
+    def promote(self, **kwargs):
+        self.pick()
+        self.excluded = self.excluded - self.promoted
+        self.included = self.included + self.promoted
 
-            for t in ["excluded", "promoted"]:
-                iter_dict[t] = {}
-                indices = state_dict[t]["indices"]
-                cost_engine = CostModel(em)
-                for i in indices:
-                    cost_engine.account(predictions[i], truths[i])
-                iter_dict[t] = cost_engine.export()
-
-            progress[n_words_included] = iter_dict
-                
-            state_dict["promoted"]["scanned_indices"] = promoted_final
-            n_words_included += len(promoted_final)
-        export[strategy] = progress
-    return export
-
-def find_indices(ls, key):
-    indices = []
-    for i, x in enumerate(ls):
-        if x == key:
-            indices.append(i)
-    return indices
-
-
+    def pick(self):
+        excluded = []
+        for i in self.excluded:
+            metric = (i, self.predictions[i])
+            excluded.append(metric)
+        self.best = self.strategy(excluded, count=self.batch_size)
+        self.promoted = set()
+        for i in best:
+            self.promoted.add(i)
+            for j in excluded_indices:
+                if self.truths[i] == self.truths[j]:
+                    self.promoted.add(j)
 
 if __name__ == '__main__':
     config = json.load(open(sys.argv[1]))
@@ -123,6 +120,10 @@ if __name__ == '__main__':
     ocr = GravesOCR(config["model"], config["lookup"])
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
-    stat_d = simulate(ocr, error, book_locs, book_index)
-    with open('outputs/%s/stats_%s.json'%(lang,  config["books"][book_index]), 'w+') as fp:
-           json.dump(stat_d, fp, indent=4)
+    #stat_d = simulate(ocr, error, book_locs, book_index)
+    simulation = Simulator(ocr=ocr, postproc=error, books=book_locs)
+    simulation.leave_one_out(book_index)
+    simulation.recognize()
+    simulation.postprocess()
+
+
