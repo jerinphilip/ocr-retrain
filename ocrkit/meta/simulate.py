@@ -2,11 +2,7 @@ import sys
 import os
 
 # Insert, so root-dir remains clean
-src = os.path.abspath("../ocr/")
-sys.path.insert(0, '../src/')
-sys.path.insert(0, '../src/meta/')
 from ocr import GravesOCR
-
 from postproc.dictionary import Dictionary
 from parser import read_book
 import json
