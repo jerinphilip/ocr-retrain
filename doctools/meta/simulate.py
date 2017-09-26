@@ -3,15 +3,15 @@ import os
 import json
 
 # Insert, so root-dir remains clean
-from docutils.ocr import GravesOCR
-from docutils.postproc.dictionary import Dictionary
-from docutils.parser import read_book
-from docutils.meta.cost_model import CostModel
-from docutils.meta.timekeep import Timer
-from docutils.meta.selection import sequential, random_index,  word_frequency
-from docutils.parser.convert import page_to_unit
-import docutils.parser.webtotrain as webtotrain
-from docutils.parser.nlp import extract_words
+from doctools.ocr import GravesOCR
+from doctools.postproc.dictionary import Dictionary
+from doctools.parser import read_book
+from doctools.meta.cost_model import CostModel
+from doctools.meta.timekeep import Timer
+from doctools.meta.selection import sequential, random_index,  word_frequency
+from doctools.parser.convert import page_to_unit
+import doctools.parser.webtotrain as webtotrain
+from doctools.parser.nlp import extract_words
 
 class Simulator:
     def __init__(self, **kwargs):
