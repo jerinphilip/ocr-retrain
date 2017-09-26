@@ -27,6 +27,24 @@ cost = {
         }
 }
 
+cost2 = {
+        # All units in seconds
+        "true": { # Correct by OCR
+            "true": 1, # Verified by dict.
+            "false": { 
+                "true": 1, # Suggestions contain
+                "false": 1 # Full type not necessary since GT = OCR Pred
+            }
+        },
+        "false": { # Incorrect by OCR
+            "true": 1, # Verified by dict => RWE
+            "false": {
+                "true": 1, # Suggestions contain
+                "false": 1, # Full type time
+            }
+        }
+}
+
 def parse(filename):
     with open(filename) as fp:
         d = json.load(fp)
@@ -57,14 +75,19 @@ def get_xy(counts):
         batchSize = x - previous
         previous = x
         unseen_cost = tree_reduce(state["excluded"], cost)
-        included_cost = tree_reduce(state["included"], cost)
+        #included_cost = tree_reduce(state["included"], cost)
         delta_cost = tree_reduce(state["promoted"], cost)
-        projected = review_cost + unseen_cost
+        projected = review_cost + delta_cost + unseen_cost
         review_cost += delta_cost
-        print("Review Cost, New cost = %d, %d"%(review_cost, included_cost))
+        total = x + tree_reduce(state["excluded"], cost2)
+        #print(total)
         xs.append(x)
         ys.append(projected)
+
+    xs.append(total)
+    ys.append(review_cost)
     return (xs, ys)
+
         
 for lang in ['ml']:
     saves, fnames = [], []

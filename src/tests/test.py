@@ -81,6 +81,20 @@ def simulate(ocr, em, book_locs, book_index):
             timer.start("iteration %d"%(n_words_included))
             print('number of words included %d'%(n_words_included))
             #for t in ["included", "excluded", "promoted"]:
+            promoted_final = set()
+            for meta_index in promoted:
+                # One pass to get all similar words
+                indices = find_indices(truths, truths[meta_index])
+                for index in indices:
+                    try:
+                        state_dict["included"]["indices"].add(index)
+                        running_vocabulary.append(truths[index])
+                        state_dict["excluded"]["indices"].remove(index)
+                    except KeyError:
+                        #print("Not found key", index)
+                        pass
+                    promoted_final.add(index)
+
             for t in ["excluded", "promoted"]:
                 iter_dict[t] = {}
                 indices = state_dict[t]["indices"]
@@ -90,21 +104,8 @@ def simulate(ocr, em, book_locs, book_index):
                 iter_dict[t] = cost_engine.export()
 
             progress[n_words_included] = iter_dict
-
-            promoted_final = set()
-            for meta_index in promoted:
-                # One pass to get all similar words
-                indices = find_indices(truths, truths[meta_index])
-                for index in indices:
-                    try:
-                        state_dict["included"]["indices"].add(index)
-                        state_dict["excluded"]["indices"].remove(index)
-                    except KeyError:
-                        #print("Not found key", index)
-                        pass
-                    promoted_final.add(index)
                 
-            state_dict["promoted"]["scanned_indices"] = promoted
+            state_dict["promoted"]["scanned_indices"] = promoted_final
             n_words_included += len(promoted_final)
         export[strategy] = progress
     return export
