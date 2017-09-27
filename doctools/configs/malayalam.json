@@ -1,10 +1,10 @@
 {
-    "model": "parameters/models/Malayalam2.xml",
-    "lookup": "parameters/lookups/Malayalam.txt",
+    "model": "/users/jerin/ocr-retrain/doctools/parameters/models/Malayalam2.xml",
+    "lookup": "/users/jerin/ocr-retrain/doctools/parameters/lookups/Malayalam.txt",
     "error": {
-        "save": "parameters/error/Malayalam/save",
-        "words": "parameters/error/Malayalam/words",
-        "alphabet": "parameters/error/Malayalam/alphabet"
+        "save": "/users/jerin/ocr-retrain/doctools/parameters/error/Malayalam/save",
+        "words": "/users/jerin/ocr-retrain/doctools/parameters/error/Malayalam/words",
+        "alphabet": "/users/jerin/ocr-retrain/doctools/parameters/error/Malayalam/alphabet"
     },
 
     "dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/",

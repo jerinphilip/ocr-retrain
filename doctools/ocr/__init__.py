@@ -1,4 +1,4 @@
-from ocr import pyocr
+from doctools.ocr import pyocr
 import numpy as np
 import cv2
 

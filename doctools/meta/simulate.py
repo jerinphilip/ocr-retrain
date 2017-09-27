@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+from pprint import pprint
 
 # Insert, so root-dir remains clean
 from doctools.ocr import GravesOCR
@@ -19,6 +20,7 @@ class Simulator:
         self.em = kwargs['postproc']
         self.fpaths = kwargs['books']
         self.batch_size = kwargs['batch_size']
+        self.debug = True
         self.strategies = [
             ("random", random_index),
             ("sequential", sequential),
@@ -26,13 +28,12 @@ class Simulator:
         ]
         self.t = 0
         self.export = {}
-        self.initialize_state()
 
     def initialize_state(self):
         self.state = {}
         for strategy, fn in self.strategies:
             self.state[strategy] = State(strategy=fn, 
-                    predictions=self.predictions)
+                    predictions=self.predictions, batch_size=self.batch_size)
 
     def leave_one_out(self, index):
         self.index = index
@@ -44,17 +45,19 @@ class Simulator:
             if i != self.index:
                 text = webtotrain.full_text(fpath)
                 bwords = extract_words(text)
-                words.append(bwords)
+                words.extend(bwords)
         self.em.enhance_vocab_with_books(words)
 
     def recognize(self):
         fpath = self.fpaths[self.index]
+        print(fpath)
         pagewise = webtotrain.read_book(fpath)
         if self.debug:
             pagewise = pagewise[5:10]
         images, self.truths = page_to_unit(pagewise)
         self.predictions = [ self.ocr.recognize(image) \
                              for image in images ]
+        self.initialize_state()
         
 
     def postprocess(self):
@@ -64,17 +67,21 @@ class Simulator:
             self.export[strategy] = {}
             for state in self.state[strategy]:
                 delta = state.export()
-                print(delta)
+                pprint(delta)
+                exit()
 
 
 class State:
     def __init__(self, **kw):
         self.included = set()
-        self.excluded = set(list(range(kw['count'])))
         self.strategy = kw['strategy']
-        self.predictions = kwargs['predictions']
+        self.predictions = kw['predictions']
+        self.batch_size = kw['batch_size']
+        count = len(self.predictions)
+        self.excluded = set(list(range(count)))
         self.best = []
         self.promoted = set()
+        self.flag = False
 
     def export(self):
         state = {
@@ -91,13 +98,14 @@ class State:
     def __next__(self):
         if not self.excluded:
             raise StopIteration()
-        self.promote()
+        if self.flag: self.promote()
+        else: self.flag = True
         return self
 
     def promote(self, **kwargs):
         self.pick()
         self.excluded = self.excluded - self.promoted
-        self.included = self.included + self.promoted
+        self.included = self.included ^ self.promoted
 
     def pick(self):
         excluded = []
@@ -106,10 +114,10 @@ class State:
             excluded.append(metric)
         self.best = self.strategy(excluded, count=self.batch_size)
         self.promoted = set()
-        for i in best:
+        for i in self.best:
             self.promoted.add(i)
-            for j in excluded_indices:
-                if self.truths[i] == self.truths[j]:
+            for j in self.excluded:
+                if self.predictions[i] == self.predictions[j]:
                     self.promoted.add(j)
 
 if __name__ == '__main__':
@@ -121,7 +129,7 @@ if __name__ == '__main__':
     error = Dictionary(**config["error"])
     book_locs = list(map(lambda x: config["dir"] + x + '/', config["books"]))
     #stat_d = simulate(ocr, error, book_locs, book_index)
-    simulation = Simulator(ocr=ocr, postproc=error, books=book_locs)
+    simulation = Simulator(ocr=ocr, postproc=error, books=book_locs, batch_size=100)
     simulation.leave_one_out(book_index)
     simulation.recognize()
     simulation.postprocess()
