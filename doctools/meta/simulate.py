@@ -58,7 +58,12 @@ class Simulator:
         self.predictions = [ self.ocr.recognize(image) \
                              for image in images ]
         self.initialize_state()
-        
+    
+    def compute_cost(self, indices):
+        costmodel = CostModel(self.em)
+        for i in indices:
+            costmodel.account(self.predictions[i], self.truths[i])
+        return costmodel.export()
 
     def postprocess(self):
         self.export = {}
@@ -67,9 +72,7 @@ class Simulator:
             self.export[strategy] = {}
             for state in self.state[strategy]:
                 delta = state.export()
-                pprint(delta)
-                exit()
-
+                pprint(compute_cost(delta["promoted"]))
 
 class State:
     def __init__(self, **kw):
