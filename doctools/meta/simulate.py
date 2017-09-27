@@ -2,6 +2,7 @@ import sys
 import os
 import json
 from pprint import pprint
+from collections import defaultdict
 
 # Insert, so root-dir remains clean
 from doctools.ocr import GravesOCR
@@ -69,10 +70,15 @@ class Simulator:
         self.export = {}
         for strategy, fn in self.strategies:
             self.vocabulary = []
-            self.export[strategy] = {}
+            self.export[strategy] = defaultdict(list)
             for state in self.state[strategy]:
                 delta = state.export()
-                pprint(compute_cost(delta["promoted"]))
+                ecost = self.compute_cost(state.excluded)
+                pcost = self.compute_cost(delta["promoted"])
+
+                self.export[strategy]["excluded"].append(ecost)
+                self.export[strategy]["promoted"].append(pcost)
+        return self.export
 
 class State:
     def __init__(self, **kw):
@@ -88,8 +94,6 @@ class State:
 
     def export(self):
         state = {
-           # "included": self.included,
-           # "excluded": self.excluded,
             "best": self.best,
             "promoted": self.promoted,
         }
@@ -135,6 +139,7 @@ if __name__ == '__main__':
     simulation = Simulator(ocr=ocr, postproc=error, books=book_locs, batch_size=100)
     simulation.leave_one_out(book_index)
     simulation.recognize()
-    simulation.postprocess()
+    stats = simulation.postprocess()
+    pprint(stats)
 
 
