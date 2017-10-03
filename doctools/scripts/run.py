@@ -43,12 +43,12 @@ if __name__ == '__main__':
     if not os.path.exists(args.output):
         os.mkdir(args.output)
 
-    langdir = os.path.join(args.output, args.lang)
-    if not os.path.exists(langdir):
-        os.mkdir(langdir)
+    #langdir = os.path.join(args.output, args.lang)
+    #if not os.path.exists(langdir):
+    #    os.mkdir(langdir)
 
     output_filename = "%s.json"%(book_name)
-    output_fpath = os.path.join(langdir, output_filename)
+    output_fpath = os.path.join(args.output, output_filename)
     with open(output_fpath, "w+") as ofp:
         json.dump(stats, ofp, indent=4)
 

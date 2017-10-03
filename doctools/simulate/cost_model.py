@@ -45,5 +45,28 @@ class CostModel:
         else:
             self.model[ocr][pp] += 1
 
+    def _linear(self, node, path):
+        if not isinstance(node, dict):
+            return [(path, node)]
+        else:
+            vs = []
+            for key in node:
+                if key != "name":
+                    paths = self._linear(node[key], tuple(list(path) + [key]))
+                    vs.extend(paths)
+            return vs
+
+    def linear(self):
+        flattened = self._linear(self.model, ())
+        flattened.sort()
+        headers, values = list(zip(*flattened))
+        return (headers, values)
+
     def export(self):
         return self.model
+
+if __name__ == '__main__':
+    cm = CostModel()
+    from pprint import pprint
+    pprint(cm.linear())
+

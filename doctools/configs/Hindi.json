@@ -1,5 +1,5 @@
 {
-    "model": "parameters/models/word/Hindi.xml", 
+    "model": "/users/jerin/ocr-retrain/doctools/parameters/models/word/Hindi.xml", 
     "books": [
         "0365", 
         "0061", 
@@ -34,11 +34,11 @@
         "0064", 
         "0367"
     ], 
-    "lookup": "parameters/lookups/Hindi.txt", 
+    "lookup": "/users/jerin/ocr-retrain/doctools/parameters/lookups/Hindi.txt", 
     "dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Hindi/", 
     "error": {
-        "alphabet": "parameters/error/Hindi/alphabet", 
-        "save": "parameters/error/Hindi/save_crawled", 
+        "alphabet": "/users/jerin/ocr-retrain/doctools/parameters/error/Hindi/alphabet", 
+        "save": "/users/jerin/ocr-retrain/doctools/parameters/error/Hindi/save_crawled", 
         "words": "/data5/deepayan/webocr/combined.txt"
     }
 }

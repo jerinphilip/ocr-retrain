@@ -64,20 +64,29 @@ class Simulator:
         costmodel = CostModel(self.em)
         for i in indices:
             costmodel.account(self.predictions[i], self.truths[i])
-        return costmodel.export()
+        #return costmodel.export()
+        return costmodel.linear()
 
     def postprocess(self):
         self.export = {}
         for strategy, fn in self.strategies:
             self.vocabulary = []
-            self.export[strategy] = defaultdict(list)
+            self.export[strategy] = {
+                    "cost": defaultdict(list),
+                    "index": defaultdict(list)
+            }
             for state in self.state[strategy]:
                 delta = state.export()
-                ecost = self.compute_cost(state.excluded)
-                pcost = self.compute_cost(delta["promoted"])
+                headers, ecost = self.compute_cost(state.excluded)
+                headers, pcost = self.compute_cost(delta["promoted"])
 
-                self.export[strategy]["excluded"].append(ecost)
-                self.export[strategy]["promoted"].append(pcost)
+                self.export[strategy]["cost"]["excluded"].append(ecost)
+                self.export[strategy]["cost"]["promoted"].append(pcost)
+
+                for key in delta:
+                    ls = list(delta[key])
+                    self.export[strategy]["index"][key].append(ls)
+
         return self.export
 
 class State:
