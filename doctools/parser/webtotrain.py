@@ -1,6 +1,7 @@
 from lxml import etree
 import cv2
 import numpy as np
+import os
 
 # Parse line.xml file.
 def parse_ocr_xml(xml_file):
@@ -88,7 +89,8 @@ def images_and_truths(udict, mapping_f):
 
         # Order atoms by Key
         atom_truths, atoms = mapping_f(text, atoms)
-        atom_images = extract_atoms(prefix+imgloc, atoms)
+        image_file_name = os.path.join(prefix,imgloc)
+        atom_images = extract_atoms(image_file_name, atoms)
         #print(len(atom_images),  len(atom_truths))
         result.append((atom_images, atom_truths))
     return result
@@ -112,8 +114,9 @@ def word_mapping_f(text, atoms):
 
 
 def read_book(book_dir_path):
-    obtainxml = lambda f: book_dir_path + f + '.xml'
+    obtainxml = lambda f: os.path.join(book_dir_path, f + '.xml')
     filenames = map(obtainxml, ['line', 'word', 'text'])
+    #print(list(filenames))
     lines, words, text = list(map(parse_ocr_xml, filenames))
     ud = group(text, words)
     ud["prefix"] = book_dir_path
@@ -124,7 +127,7 @@ def read_book(book_dir_path):
 
 def full_text(book_dir_path):
     """ Used to extract all the vocabulary in a particular book """
-    text_file = book_dir_path + 'text.xml'
+    text_file = os.path.join(book_dir_path, 'text.xml')
     text_d = parse_ocr_xml(text_file)
     text = ""
     for d in text_d:

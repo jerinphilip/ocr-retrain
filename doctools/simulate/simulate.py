@@ -8,9 +8,9 @@ from collections import defaultdict
 from doctools.ocr import GravesOCR
 from doctools.postproc.dictionary import Dictionary
 from doctools.parser import read_book
-from doctools.meta.cost_model import CostModel
-from doctools.meta.timekeep import Timer
-from doctools.meta.selection import sequential, random_index,  word_frequency
+from doctools.simulate.cost_model import CostModel
+from doctools.simulate.timekeep import Timer
+from doctools.simulate.selection import sequential, random_index,  word_frequency
 from doctools.parser.convert import page_to_unit
 import doctools.parser.webtotrain as webtotrain
 from doctools.parser.nlp import extract_words
@@ -20,7 +20,7 @@ class Simulator:
         self.ocr = kwargs['ocr']
         self.em = kwargs['postproc']
         self.fpaths = kwargs['books']
-        self.batch_size = kwargs['batch_size']
+        self.n_batches = kwargs['batches']
         self.debug = True
         self.strategies = [
             ("random", random_index),
@@ -34,7 +34,7 @@ class Simulator:
         self.state = {}
         for strategy, fn in self.strategies:
             self.state[strategy] = State(strategy=fn, 
-                    predictions=self.predictions, batch_size=self.batch_size)
+                    predictions=self.predictions, divisions=self.n_batches)
 
     def leave_one_out(self, index):
         self.index = index
@@ -85,7 +85,7 @@ class State:
         self.included = set()
         self.strategy = kw['strategy']
         self.predictions = kw['predictions']
-        self.batch_size = kw['batch_size']
+        self.batch_size = int(len(self.predictions)/kw['divisions'])
         count = len(self.predictions)
         self.excluded = set(list(range(count)))
         self.best = []
