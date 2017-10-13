@@ -30,8 +30,17 @@ class Accounting:
         return (self.xs, self.ys)
     
     def cost(self, ls):
-        ws = [0, 1, 0, 0, 0, 0]
-        #print(ls)
+        # ws = [
+        #    (False, False, False) 
+        #       => Incorrect at all three stages => 30 seconds
+        #    (False, False, True)
+        #       => Incorrect, but postproc saved => 5 seconds
+        #    (False, True)
+        #       => Incorrect, but postproc errored => Infinity
+        #    (True, False, False)   => Correct => 0 seconds
+        #    (True, False, True)    => Correct => 0 seconds
+        #    (True, True)           => Correct => 0 seconds
+        ws = [30, 5, 0, 0, 0, 0]
         return sum([w*l for w,l in zip(ws, ls)])
 
 

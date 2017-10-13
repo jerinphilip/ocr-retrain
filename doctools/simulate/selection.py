@@ -43,11 +43,12 @@ def word_frequency(d_item, **kwargs):
     k_best = [table[w] for w, f in w_best]
 
     j = 0
-    while len(k_best) < k:
-        i, p = d_item[j]
-        if table[p] != i:
-            k_best.append(i)
-        j = j + 1
+    # Commenting out below part, to process in batch.
+    #while len(k_best) < k:
+    #    i, p = d_item[j]
+    #    if table[p] != i:
+    #        k_best.append(i)
+    #    j = j + 1
     return k_best
 
 

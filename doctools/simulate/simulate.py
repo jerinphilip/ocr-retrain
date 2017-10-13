@@ -80,7 +80,7 @@ class Simulator:
                 self.em.enhance_vocabulary(state.vocabulary)
                 delta = state.export()
                 headers, ecost = self.compute_cost(state.excluded)
-                headers, pcost = self.compute_cost(delta["promoted"])
+                headers, pcost = self.compute_cost(delta["best"])
 
                 self.export[strategy]["cost"]["excluded"].append(ecost)
                 self.export[strategy]["cost"]["promoted"].append(pcost)
