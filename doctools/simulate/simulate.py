@@ -21,7 +21,7 @@ class Simulator:
         self.em = kwargs['postproc']
         self.fpaths = kwargs['books']
         self.n_batches = kwargs['batches']
-        self.debug = True
+        self.debug = False
         self.strategies = [
             ("random", random_index),
             ("sequential", sequential),
@@ -67,6 +67,7 @@ class Simulator:
         #return costmodel.export()
         return costmodel.linear()
 
+
     def postprocess(self):
         self.export = {}
         for strategy, fn in self.strategies:
@@ -76,6 +77,7 @@ class Simulator:
                     "index": defaultdict(list)
             }
             for state in self.state[strategy]:
+                self.em.enhance_vocabulary(state.vocabulary)
                 delta = state.export()
                 headers, ecost = self.compute_cost(state.excluded)
                 headers, pcost = self.compute_cost(delta["promoted"])
@@ -100,6 +102,7 @@ class State:
         self.best = []
         self.promoted = set()
         self.flag = False
+        self.vocabulary = set()
 
     def export(self):
         state = {
@@ -122,6 +125,8 @@ class State:
         self.pick()
         self.excluded = self.excluded - self.promoted
         self.included = self.included ^ self.promoted
+        for i in self.promoted:
+            self.vocabulary.add(self.predictions[i])
 
     def pick(self):
         excluded = []

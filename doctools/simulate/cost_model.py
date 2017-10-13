@@ -33,6 +33,7 @@ class CostModel:
                 r += cost[key]*d[key]
         return r
 
+
     def account(self, prediction, truth):
         assert(self.em is not None)
         threshold = 1
