@@ -14,17 +14,32 @@ def pick_best(**kwargs):
 def sequential(d_item, **kwargs):
     k = kwargs['count']
     indices, predictions = zip(*d_item)
-    k = min(k, len(predictions))
-    k_best = [index for index in indices[:k]] 
+    k = min(k, len(set(predictions)))
+    running_set = set()
+    k_best = []
+    for index, prediction in d_item:
+        if prediction not in running_set:
+            running_set.add(prediction)
+            k_best.append(index)
+            if len(k_best) == k:
+                break
     return k_best
 
 
 def random_index(d_item, **kwargs):
     k = kwargs['count']
     indices, predictions = zip(*d_item)
-    k = min(k, len(predictions))
-    indices = list(indices)
-    k = min(len(indices),k)
+    k = min(k, len(set(predictions)))
+    k_best = []
+    running_set = set()
+    indices = set(indices)
+    d_item = set(d_item)
+    while len(k_best) < k:
+        index, prediction = random.choice(list(d_item))
+        d_item.remove((index, prediction))
+        if prediction not in running_set:
+            running_set.add(prediction)
+            k_best.append(index)
     k_best  = random.sample(indices, k)
     return k_best
 

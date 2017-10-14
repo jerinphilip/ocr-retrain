@@ -1,5 +1,5 @@
 import json
-from plot import plot
+from .plot import plot
 
 class Accounting:
     def __init__(self):
@@ -54,8 +54,10 @@ def f(path):
             cexcl = stats[method]["cost"]["excluded"]
             cprom = stats[method]["cost"]["promoted"]
             iprom = stats[method]["index"]["promoted"]
+            ibest = stats[method]["index"]["best"]
             n = len(cexcl)
             for t in range(n):
+                print("Best: %d, Promoted: %d"%( len(ibest[t]), len(iprom[t])))
                 log.promote(indices=iprom[t])
                 log.account(excluded=cexcl[t], promoted=cprom[t])
             #print(log.axes())
