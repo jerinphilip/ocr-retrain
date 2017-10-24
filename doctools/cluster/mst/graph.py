@@ -1,3 +1,4 @@
+from collections import defaultdict
 from .dsu import DSU
 
 class Graph:
@@ -30,11 +31,38 @@ class Graph:
     def cluster(self, **kwargs):
         """ Define clustering here """
         edges = self.tree()
-        disconnected = {}
+        adj = defaultdict(list)
         T = kwargs['threshold']
         for edge in edges:
             link, w = edge
             if w < T:
-                break
-            disconnected[link] = w
+                u, v = link
+                adj[u].append(v)
+                adj[v].append(u)
+
+        visited = dict([(u, 0) for u in adj])
+        # Do DFS on adj to get components
+        def dfs(u):
+            traversed = []
+            stack = [u]
+            while not stack:
+                _u = stack.pop()
+                visited[_u] = 2
+                traversed.append(_u)
+                for v in adj[_u]:
+                    if visited[v] == 0:
+                        visited[v] = 1
+                        stack.append(v)
+            return traversed
+
+        components = []
+            
+        for u in adj:
+            if not visited[u]:
+                connected = dfs(u)
+                components.append(connected)
+
+        return components
+
+
 
