@@ -24,7 +24,8 @@ class Accounting:
         self.ys.append(projected)
 
     def promote(self, **kwargs):
-        self.nreview += len(kwargs['indices'])
+        self.nreview += len(kwargs['best'])
+        self.nprocessed += len(kwargs['promoted'])
 
     def axes(self):
         return (self.xs, self.ys)
@@ -58,7 +59,7 @@ def f(path):
             n = len(cexcl)
             for t in range(n):
                 print("Best: %d, Promoted: %d"%( len(ibest[t]), len(iprom[t])))
-                log.promote(indices=iprom[t])
+                log.promote(promoted=iprom[t])
                 log.account(excluded=cexcl[t], promoted=cprom[t])
             #print(log.axes())
             methods.append((method, log.axes()))
