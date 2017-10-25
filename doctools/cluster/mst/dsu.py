@@ -10,23 +10,23 @@ class DSU:
         u = self.find(x)
         v = self.find(y)
 
-        if R[u] == R[v]:
-            R[u] = R[u] + 1
-            parent[v] = u
+        if self.rank[u] == self.rank[v]:
+            self.rank[u] = self.rank[u] + 1
+            self.parent[v] = u
 
-        elif R[u] > R[v]:
-            parent[v] = u
+        elif self.rank[u] > self.rank[v]:
+            self.parent[v] = u
 
         else:
-            parent[u] = v
+            self.parent[u] = v
 
     def find(self, x):
-        if x == parent[x]: return x
-        parent[x] = self._find(parent[x])
-        return parent[x]
+        if x == self.parent[x]: return x
+        self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
 
     def same(self, x, y):
-        return D.find(x) == D.find(y)
+        return self.find(x) == self.find(y)
 
 
 

@@ -1,8 +1,9 @@
 from collections import defaultdict
 from .dsu import DSU
+import numpy as np
 
 class Graph:
-    def __init__(**kwargs):
+    def __init__(self, **kwargs):
         self.V = kwargs['vertices']
         self.edges = {}
 
@@ -30,7 +31,7 @@ class Graph:
 
     def cluster(self, **kwargs):
         """ Define clustering here """
-        edges = self.tree()
+        edges = self.tree().items()
         adj = defaultdict(list)
         T = kwargs['threshold']
         for edge in edges:
@@ -63,6 +64,19 @@ class Graph:
                 components.append(connected)
 
         return components
+
+    def matrix(self, **kwargs):
+        edges = self.tree().items()
+        T = kwargs['threshold']
+        adj = np.zeros((self.V, self.V))
+        for edge in edges:
+            link, w = edge
+            if w < T:
+                u, v = link
+                adj[u][v] = w
+                adj[v][u] = w
+
+        return adj
 
 
 
