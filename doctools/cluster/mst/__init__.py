@@ -9,8 +9,8 @@ def cluster(X, d, **kwargs):
         for j in range(i+1, n):
             x, y = X[i], X[j]
             w = d(x, y)
-            u, v = f(x), f(y)
-            G.add_edge(u, v, w)
+            #u, v = f(x), f(y)
+            G.add_edge(i, j, w)
             #print("Adding", u, v)
             #print("Adding", x, y)
 
