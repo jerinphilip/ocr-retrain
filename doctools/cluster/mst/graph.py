@@ -34,19 +34,21 @@ class Graph:
         edges = self.tree().items()
         adj = defaultdict(list)
         T = kwargs['threshold']
+        new_edges = {}
         for edge in edges:
             link, w = edge
             if w < T:
                 u, v = link
                 adj[u].append(v)
                 adj[v].append(u)
+                new_edges[link] = w
 
         visited = dict([(u, 0) for u in adj])
         # Do DFS on adj to get components
         def dfs(u):
             traversed = []
             stack = [u]
-            while not stack:
+            while stack:
                 _u = stack.pop()
                 visited[_u] = 2
                 traversed.append(_u)
@@ -63,7 +65,7 @@ class Graph:
                 connected = dfs(u)
                 components.append(connected)
 
-        return components
+        return (new_edges, components)
 
     def matrix(self, **kwargs):
         edges = self.tree().items()

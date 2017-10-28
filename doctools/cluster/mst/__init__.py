@@ -10,12 +10,15 @@ def cluster(X, d, **kwargs):
             x, y = X[i], X[j]
             w = d(x, y)
             #u, v = f(x), f(y)
-            G.add_edge(i, j, w)
-            #print("Adding", u, v)
-            #print("Adding", x, y)
+            if w < kwargs['prune_above']:
+                G.add_edge(i, j, w)
 
-    # clusters = G.cluster()
-    matrix = G.matrix(**kwargs)
-    return matrix
+    options = {
+        'components': lambda : G.cluster(**kwargs),
+        'matrix': lambda : G.matrix(**kwargs)
+    }
+    if 'rep' in kwargs:
+        return options.get(kwargs['rep'])()
+    return G.matrix(**kwargs)
 
 
