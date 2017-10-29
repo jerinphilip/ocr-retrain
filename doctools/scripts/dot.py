@@ -2,7 +2,6 @@
 def as_dot(words, edges, component):
     def uid(i):
         return 'node_{}'.format(i)
-        #return '{}_{}'.format(i, i)
 
     def node(i):
         return '{} [label="{}"];'.format(uid(i), words[i])

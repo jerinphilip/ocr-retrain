@@ -55,5 +55,9 @@ class GravesOCR:
         chars = list(map(lambda x: self.stringToUnicode(x), cps))
         return ''.join(chars)
 
+    def predict(self, images):
+        predictions = [self.recognize(image) for image in images]
+        return predictions
+
 
 
