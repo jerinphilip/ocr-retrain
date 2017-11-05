@@ -1,6 +1,7 @@
 from lxml import etree
 from .mapping import line_mapping_f, word_mapping_f
 from .imgproc import extract_units
+import os
 
 # Parse line.xml file.
 def parse_ocr_xml(xml_file):
@@ -44,7 +45,8 @@ def images_and_truths(udict, mapping_f):
 
         # Order units by Key
         unit_truths, units = mapping_f(text, units)
-        unit_images = extract_units(prefix+imgloc, units)
+        imgpath = os.path.join(prefix, imgloc)
+        unit_images = extract_units(imgpath, units)
         #print(len(unit_images),  len(unit_truths))
         result.append((unit_images, unit_truths))
     return result
@@ -54,7 +56,7 @@ def read_book(**kwargs):
     book_dir_path = kwargs['book_path']
     opt_unit = kwargs['unit']
 
-    obtainxml = lambda f: book_dir_path + f + '.xml'
+    obtainxml = lambda f: os.path.join(book_dir_path, f + '.xml')
     filenames = map(obtainxml, ['line', 'word', 'text'])
     lines, words, text = list(map(parse_ocr_xml, filenames))
     units = words
@@ -66,4 +68,14 @@ def read_book(**kwargs):
     ud["prefix"] = book_dir_path
     pagewise = images_and_truths(ud, mapping_f)
     return pagewise
+
+
+def text(book_dir_path):
+    """ Used to extract all the vocabulary in a particular book """
+    text_file = os.path.join(book_dir_path, 'text.xml')
+    text_d = parse_ocr_xml(text_file)
+    processed = ""
+    for d in text_d:
+        processed += d["Text"]
+    return processed
 
