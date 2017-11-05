@@ -3,6 +3,7 @@ import os
 from doctools.ocr import GravesOCR
 from doctools.postproc.dictionary import Dictionary
 from doctools.parser import read_book
+from doctoools.util import logtime
 import json
 #from cost_model import CostModel
 #from timekeep import Timer

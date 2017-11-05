@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset
 from torchvision import transforms, utils
 from nltk.stem.porter import *
+import os
 
 import cv2
 
@@ -72,12 +73,14 @@ class HWRoiDataset(Dataset):
         #pdb.set_trace()
         try:
             #Read image
-            image = cv2.imread(self.imgFolder+self.imgPaths[idx], cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            path = os.path.join(self.imgFolder, self.imgPaths[idx])
+            image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             h,w = image.shape
         except:
             print('Warning: while rendering --%s-- at index %d. Rendering default value' % (self.vocabIdx[self.words[idx]],idx))
             idx=0
-            image = cv2.imread(self.imgFolder+self.imgPaths[idx], cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            path = os.path.join(self.imgFolder, self.imgPaths[idx])
+            image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             h,w = image.shape
         #pdb.set_trace()
         # if self.randFlag:
