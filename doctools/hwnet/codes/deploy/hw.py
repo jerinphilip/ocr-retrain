@@ -121,7 +121,7 @@ if __name__ == '__main__':
     output_dir = os.path.join(_margs.output, book_name)
     hw_dict = {
         "img_folder": output_dir,
-        "test_vocab_file": os.path.join(output_dir, 'annotation.txt'),
+        "test_vocab_file": os.path.join(output_dir, 'praveen-in.txt'),
         "save_dir": output_dir,
         "pretrained_path": "/users/jerin/ocr-retrain/doctools/hwnet/pretrained_models/ckpt_best.t7"
     }
