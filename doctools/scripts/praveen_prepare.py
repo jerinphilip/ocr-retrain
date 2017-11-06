@@ -4,13 +4,14 @@ import codecs, sys, os
 from .opts import base_opts
 from argparse import ArgumentParser
 import json
+import numpy as np
 
 def operate(bookPath, outputDir):
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
     gtFileName = os.path.join(outputDir, 'annotation.txt')
     gtFile = codecs.open(gtFileName,'w',encoding='utf8')
     pagewise = read_book(book_path=bookPath, unit='word')
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
 
     pageNo = 0
     for page in pagewise:
@@ -20,11 +21,13 @@ def operate(bookPath, outputDir):
             wordNo=0
             for image in images: #if #images #truths mapping might go wrong
                 wordNo += 1
-                wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.png'
+                image = 255*image
+                image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+                wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
                 wordImageName = os.path.join(outputDir, wordImageBaseName)
-                wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.png'
+                wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
                 gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
-                cv2.imwrite(wordImageName, images[wordNo -1])
+                cv2.imwrite(wordImageName, image)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -36,7 +39,9 @@ if __name__ == '__main__':
 
     book_name = config["books"][args.book]
     path = os.path.join(config["dir"], book_name)
-    operate(path, args.output)
+
+    output_dir = os.path.join(args.output, book_name)
+    operate(path, output_dir)
 
 
 

@@ -7,6 +7,7 @@ from torch.autograd import Variable
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import json
 
 import numpy as np
 import argparse
@@ -25,13 +26,19 @@ except:
     import synthTransformer as synthTrans
     import hwroidataset as hwROIDat
 
-def hwnet_args(parser):
+def hwnet_opts(parser):
     parser.add_argument('--img_folder', help='image root folder', required=True)
     parser.add_argument('--test_vocab_file', help='test IAM file', required=True)
     parser.add_argument('--save_dir',  help='output directory to save files', required=True)
     parser.add_argument('--batch_size', type=int, default=128, help='batch_size')
     parser.add_argument('--pretrained_path',  help='pre trained file path', required=True)
     parser.add_argument('--arch', default='resnetROI34', help='architecture selection')
+
+def base_opts(parser):
+    parser.add_argument('-o', '--output', required=True, help="Output directory")
+    parser.add_argument("-c", "--config", type=str, required=True, help="/path/to/config")
+    parser.add_argument("-l", "--lang", type=str, required=True, help="language to run for")
+    parser.add_argument("-b", "--book", type=int, required=True, help="id of the book to run simulation on")
 
 import sys
 print(os.environ['LANG'])
@@ -103,7 +110,30 @@ def main(args):
 
 
 if __name__ == '__main__':
+    _mparser = argparse.ArgumentParser(description='Adaptor, bitch!')
+    base_opts(_mparser)
+    _margs = _mparser.parse_args()
+
+    config_file = open(_margs.config)
+    config = json.load(config_file)
+    book_name = config["books"][_margs.book]
+    path = os.path.join(config["dir"], book_name)
+    output_dir = os.path.join(_margs.output, book_name)
+    hw_dict = {
+        "img_folder": output_dir,
+        "test_vocab_file": os.path.join(output_dir, 'annotation.txt'),
+        "save_dir": output_dir,
+        "pretrained_path": "/users/jerin/ocr-retrain/doctools/hwnet/pretrained_models/ckpt_best.t7"
+    }
+
+    hw_args = []
+    for key in hw_dict:
+        aval = ['--{}'.format(key), hw_dict[key]]
+        hw_args.extend(aval)
+
     parser = argparse.ArgumentParser(description='PyTorch HWNet Training')
-    hwnet_args(parser)
-    args = parser.parse_args()
+    hwnet_opts(parser)
+    args = parser.parse_args(hw_args)
+    print(args)
     main(args)
+
