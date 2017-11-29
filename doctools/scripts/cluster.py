@@ -5,7 +5,7 @@ from doctools.parser import webtotrain
 from argparse import ArgumentParser
 from pprint import pprint
 from .dot import as_dot
-from distance import levenshtein
+# from distance import levenshtein
 import json
 from functools import partial
 import pdb
@@ -20,13 +20,26 @@ import cv2
 import pdb
 from sklearn.neighbors import KNeighborsClassifier
 from collections import Counter
-
+from .debug import time
+import pickle
 def get_index(a):
     uniques = np.unique(np.array(a))
     idx = {u:[] for u in uniques}
     for i, v in enumerate(a):
         idx[v].append(i)
     return dict(sorted(idx.items(),key=lambda x: -len(x[1])))
+def save(**kwargs):
+    data = kwargs['data']
+    meta = kwargs['book']
+    loc = kwargs['outpath']
+    if not kwargs['feat']:
+        with open('%s/%s.pkl'%(loc, meta),'wb') as f:
+            pickle.dump(data, f)
+        print('Book predictions saved..')
+    else:
+        with open('%s/%s_features_cluster.pkl'%(loc, meta),'wb') as f:
+            pickle.dump(data, f)
+        print('Book featutres saved..')
 
 def visualize(path, components):
     with open(os.path.join(fpath, 'annotation.txt'), 'r') as in_file:
@@ -66,28 +79,52 @@ def k_nearest(fpath):
     pdb.set_trace()
     acc = [1 if y_predict[i]==test_words[i] else 0 for i in  range(len(test_words))]
     print(sum(acc)/len(test_words))
-
+@time
 def get_predictions(fpath):
     print("Reading book...", end='', flush=True)
     pagewise = webtotrain.read_book(fpath)
+    
     print("Done")
     images, truths = page_to_unit(pagewise)
     print("Predicting....", end='', flush=True)
     predictions = ocr.predict(images)
     print("Done")
     errored = [predictions[i] for i in range(len(truths)) if predictions[i] != truths[i]]
-    return errored
+    return errored, predictions
 
+def get_images(fpath):
+    print("Reading book...", end='', flush=True)
+    pagewise = webtotrain.read_book(fpath)
+    print("Done")
+    images, truths = page_to_unit(pagewise)
+    return images
+@time
 def get_features(fpath):
+    print('Loading features...')
     feat = np.load(os.path.join(fpath, "feats.npy"))
     features = [feat[i] for i in range(feat.shape[0])]
+    print('Done....')
     return features
-
+@time
 def form_clusters(elements, dist):
     print("Clustering....", end='', flush=True)
     edges, components = cluster(elements, dist, threshold=0.5, prune_above=0.8, rep='components')
     print("Done")
     return edges, components
+@time
+def find_examplars(all_edges):
+    return set([ex for ex, c in all_edges])
+@time
+def group_components(exemplars, all_edges):
+    all_comp = []
+    for e in exemplars:
+        comp = []
+        for ex, cl in all_edges:
+            if ex == e:
+                comp.append(cl)
+        all_comp.append(comp)
+    return all_comp
+
 
 if __name__ == '__main__':
  
@@ -105,18 +142,53 @@ if __name__ == '__main__':
     book_name = config["books"][args.book]
     feat_path = os.path.join(config["feat_dir"], config["books"][args.book])
     fpath = os.path.join(config["dir"], config["books"][args.book])
+    outpath = args.output
+    outpath_pickled = os.path.join(args.output, 'pickled')
     # # neigh = KNeighborsClassifier(n_neighbors=3)
+    images = get_images(fpath)
     features = get_features(feat_path)
-    errors = get_predictions(fpath)
-    edges_word, comp_words = form_clusters(errors, lev)
-    edges_feat, comp_feat = form_clusters(features, cos)
-    for c, component in enumerate(comp_words):
-        #rep = as_dot(predictions, edges, component) 
-        rep = as_dot(errors, edges_word, comp_word) 
-        of = os.path.join(args.output, "{}.dot".format(c))
-        #of = "{}_{}.dot".format(args.output, c)
-        with open(of, "w+") as ofp:
-            ofp.write(rep)
+    if len(images) == len(features):
+        print('match found ....')
+        if os.path.exists(os.path.join('%s'%outpath_pickled,'%s.pkl'%book_name)):
+            print('Loading predictions...')
+            with open(os.path.join('%s'%outpath_pickled,'%s.pkl'%book_name), 'rb') as f:
+                predictions = pickle.load(f)
+        else:
+            errors, predictions = get_predictions(fpath)
+            save(data = predictions, book = book_name, outpath=outpath_pickled, feat=False)
+        # images = get_images(fpath)
+
+        edges_word, comp_words = form_clusters(predictions, lev)
+        if os.path.exists(os.path.join(outpath_pickled, '%s_features_cluster.pkl'%book_name)):
+            print('Loading features...')
+            with open(os.path.join('%s'%outpath_pickled,'%s_features_cluster.pkl'%book_name), 'rb') as f:
+                edges_feat = pickle.load(f)
+        else:
+            edges_feat, comp_feat = form_clusters(features, cos)
+            save(data = edges_feat, book=book_name, outpath=outpath_pickled, feat=True)
+        
+        edges_combined = {**edges_word, **edges_feat}
+        exemplars = find_examplars(edges_combined)
+        combined_clusters = group_components(exemplars, list(edges_combined.keys()))
+        mydict = dict(zip(list(exemplars), combined_clusters))
+        with open('%s/jsons/%s.json'%(outpath, book_name), 'w+') as fp:
+               json.dump(mydict, fp, indent=4)
+    else:
+        print('for book %s features and images did not match'%book_name)
+
+
+    # pdb.set_trace()
+    print("Finished...")
+
+    
+
+    # for c, component in enumerate(comp_words):
+    #     #rep = as_dot(predictions, edges, component) 
+    #     rep = as_dot(errors, edges_word, comp_word) 
+    #     of = os.path.join(args.output, "{}.dot".format(c))
+    #     #of = "{}_{}.dot".format(args.output, c)
+    #     with open(of, "w+") as ofp:
+    #         ofp.write(rep)
     
     # visualize(fpath, components)
     
