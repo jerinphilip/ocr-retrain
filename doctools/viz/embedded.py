@@ -4,6 +4,7 @@ import sys, random
 from nltk.tokenize import RegexpTokenizer
 import numpy as np
 from matplotlib import pyplot as plt
+import matplotlib
 
 def embedded(truths, predictions, components):
     """
@@ -67,10 +68,21 @@ def embedded(truths, predictions, components):
     width = 0.35
     indices = range(len(ys))
     cumulative = np.zeros(len(indices))
-    for entry in entries:
-        p1 = plt.bar(indices, entry, width, color='#d62728', bottom=cumulative)
+
+    cmap = plt.get_cmap('Paired', max_length)    # PiYG
+    colors = []
+
+    for i in range(cmap.N):
+        rgb = cmap(i)[:3] # will return rgba, we take only first 3 so we get rgb
+        color = matplotlib.colors.rgb2hex(rgb)
+        colors.append(color)
+
+    for i, entry in enumerate(entries):
+        p1 = plt.bar(indices, entry, width, color=colors[i], bottom=cumulative)
         cumulative += entry
         print(entry)
+    
+    plt.show()
         
     # Draw a stacked bar chart, for a given set of xs and ys.
     #ax1.hist(x, n_bins, normed=1, histtype='bar', stacked=True)
