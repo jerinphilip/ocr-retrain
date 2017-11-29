@@ -21,13 +21,24 @@ def operate(bookPath, outputDir):
             wordNo=0
             for image in images: #if #images #truths mapping might go wrong
                 wordNo += 1
-                image = 255*image
-                image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-                wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
-                wordImageName = os.path.join(outputDir, wordImageBaseName)
-                wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
-                gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
-                cv2.imwrite(wordImageName, image)
+                try:
+                    image = 255*image
+                    image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+                    wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                    wordImageName = os.path.join(outputDir, wordImageBaseName)
+                    wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                    cv2.imwrite(wordImageName, image)
+                    gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
+                except:
+                    image = np.zeros((32, 32))
+                    wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                    wordImageName = os.path.join(outputDir, wordImageBaseName)
+                    wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                    cv2.imwrite(wordImageName, image)
+                    gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
+                    
+
+
 
 if __name__ == '__main__':
     parser = ArgumentParser()
