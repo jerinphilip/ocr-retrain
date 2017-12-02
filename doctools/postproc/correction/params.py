@@ -4,6 +4,7 @@ params = {
     "verify": 5,
     "dropdown": 5,
     "ignore": 0,
+
     "books":[
     		'0022',
     		'0029',
@@ -14,5 +15,6 @@ params = {
     		'0191', 
     		'0211'
     		]
+
 }
 
