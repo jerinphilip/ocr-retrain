@@ -65,13 +65,16 @@ def cluster(predictions, truths, dictionary, components):
         best = max(truths_counter.items(), key=lambda x: x[1])
         selection, _ = best
         cost, errors = 0, 0
+
+        # TODO enhance this section with more complexity
         for i in errored_indices:
             if prediction[i] != selection:
                 errors += 1
 
         cost += params["cluster"]
         return (cost, errors)
-
+    
+    cost, errors = 0, 0
     for component in components:
         _cost, _errors = compute(component)
         cost += _cost
