@@ -1,5 +1,5 @@
 from .params import params
-
+from collections import Counter
 
 def naive(predictions, truths, dictionary):
     # Count number of errored words
@@ -37,4 +37,44 @@ def suggest(predictions, truths, dictionary):
             if prediction != truth:
                 errors += 1
     
+    return (cost, errors)
+
+def cluster(predictions, truths, dictionary, components):
+    cost, errors = 0, 0
+
+    # Group predictions by components.
+    # Assume all gets corrected in one go.
+
+    def get(array, indices):
+        return [array[i] for i in indices]
+    
+    def compute(component):
+        # Obtain errored indices
+        errored_indices = []
+        for i in components:
+            prediction, truth = predictions[i], truths[i]
+            if dictionary.error(prediction):
+                errored_indices.append(i)
+            else:
+                if prediction != truth:
+                    errors += 1
+
+        # Generate suggestions from component truths
+        component_truths = get(truths, component) 
+        truths_counter = Counter(component_truths)
+        best = max(truths_counter.items(), key=lambda x: x[1])
+        selection, _ = best
+        cost, errors = 0, 0
+        for i in errored_indices:
+            if prediction[i] != selection:
+                errors += 1
+
+        cost += params["cluster"]
+        return (cost, errors)
+
+    for component in components:
+        _cost, _errors = compute(component)
+        cost += _cost
+        errors += _errors
+
     return (cost, errors)
