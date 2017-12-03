@@ -1,6 +1,7 @@
-from doctools.cluster.mst import cluster
+from doctools.cluster.mst import cluster, merge
 from doctools.cluster.distance import jaccard, lev, euc, cos
 from doctools.parser.convert import page_to_unit
+from doctools.meta.file_locs import get_pickeled, get_clusters
 from doctools.parser import webtotrain
 from argparse import ArgumentParser
 from pprint import pprint
@@ -137,47 +138,38 @@ if __name__ == '__main__':
     # Load OCR
     print(config["model"])
     ocr = GravesOCR(config["model"], config["lookup"])
-
+    book_list =['0022', '0029', '0040', '0060', '0061','0191', '0069', '0211']
+    # book_list = ['0191']
     # Parse Book in and predict
-    book_name = config["books"][args.book]
-    feat_path = os.path.join(config["feat_dir"], config["books"][args.book])
-    fpath = os.path.join(config["dir"], config["books"][args.book])
+    book_name = book_list[args.book]
     outpath = args.output
     outpath_pickled = os.path.join(args.output, 'pickled')
     # # neigh = KNeighborsClassifier(n_neighbors=3)
-    images = get_images(fpath)
-    features = get_features(feat_path)
+    features = get_features(os.path.join(config["feat_dir"], book_name))
+    print(book_name)
+    images = get_images(os.path.join(config["dir"], book_name))
     if len(images) == len(features):
-        print('match found ....')
-        if os.path.exists(os.path.join('%s'%outpath_pickled,'%s.pkl'%book_name)):
-            print('Loading predictions...')
-            with open(os.path.join('%s'%outpath_pickled,'%s.pkl'%book_name), 'rb') as f:
-                predictions = pickle.load(f)
-        else:
-            errors, predictions = get_predictions(fpath)
-            save(data = predictions, book = book_name, outpath=outpath_pickled, feat=False)
-        # images = get_images(fpath)
 
+        predictions = get_pickeled(book_name, type="predictions")
         edges_word, comp_words = form_clusters(predictions, lev)
-        if os.path.exists(os.path.join(outpath_pickled, '%s_features_cluster.pkl'%book_name)):
-            print('Loading features...')
-            with open(os.path.join('%s'%outpath_pickled,'%s_features_cluster.pkl'%book_name), 'rb') as f:
-                edges_feat = pickle.load(f)
+        print("Into features now ..... :/ ")
+        if get_pickeled(book_name, type="edges"):
+            edges_feat = get_pickeled(book_name, type="edges")
         else:
-            edges_feat, comp_feat = form_clusters(features, cos)
+            edges_feat, comp_feat = form_clusters(features, 1-cos)
             save(data = edges_feat, book=book_name, outpath=outpath_pickled, feat=True)
         
-        edges_combined = {**edges_word, **edges_feat}
-        exemplars = find_examplars(edges_combined)
-        combined_clusters = group_components(exemplars, list(edges_combined.keys()))
-        mydict = dict(zip(list(exemplars), combined_clusters))
-        with open('%s/jsons/%s.json'%(outpath, book_name), 'w+') as fp:
-               json.dump(mydict, fp, indent=4)
-    else:
-        print('for book %s features and images did not match'%book_name)
+    #     edges_combined, components_combined = merge(edges_word, edges_feat, predictions)
+
+    #     exemplars = find_examplars(edges_combined)
+        
+    #     mydict = dict(zip(list(exemplars), components_combined))
+    #     with open('%s/jsons/%s.json'%(outpath, book_name), 'w+') as fp:
+    #            json.dump(mydict, fp, indent=4)
+    # else:
+    #     print('for book %s features and images did not match'%book_name)
 
 
-    # pdb.set_trace()
     print("Finished...")
 
     
