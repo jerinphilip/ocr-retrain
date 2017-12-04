@@ -68,6 +68,7 @@ def k_nearest(fpath):
     with open(os.path.join(fpath, 'annotation.txt'), 'r') as in_file:
         lines = in_file.readlines()
     words = [line.rsplit()[1] for line in lines]
+    neigh = KNeighborsClassifier(n_neighbors=3) 
     test_words = np.array(words[2000:])
     test_features = np.array(features[2000:])
     test_index = get_index(test_words)
@@ -98,7 +99,7 @@ def get_images(fpath):
     pagewise = webtotrain.read_book(fpath)
     print("Done")
     images, truths = page_to_unit(pagewise)
-    return images
+    return images, truths
 @time
 def get_features(fpath):
     print('Loading features...')
@@ -107,7 +108,8 @@ def get_features(fpath):
     print('Done....')
     return features
 @time
-def form_clusters(elements, dist):
+def form_clusters(elements, **kwargs):
+    dist  = kwargs["distance"]
     print("Clustering....", end='', flush=True)
     edges, components = cluster(elements, dist, threshold=0.5, prune_above=0.8, rep='components')
     print("Done")
@@ -147,17 +149,23 @@ if __name__ == '__main__':
     # # neigh = KNeighborsClassifier(n_neighbors=3)
     features = get_features(os.path.join(config["feat_dir"], book_name))
     print(book_name)
-    images = get_images(os.path.join(config["dir"], book_name))
+    images, truths = get_images(os.path.join(config["dir"], book_name))
+    # k_nearest(os.path.join(config["feat_dir"], book_name))
     if len(images) == len(features):
 
         predictions = get_pickeled(book_name, type="predictions")
-        edges_word, comp_words = form_clusters(predictions, lev)
+        # edges_word, comp_words = form_clusters(predictions, lev)
         print("Into features now ..... :/ ")
-        if get_pickeled(book_name, type="edges"):
+        if get_pickeled(book_name, type="edges")!= None:
             edges_feat = get_pickeled(book_name, type="edges")
+            
         else:
-            edges_feat, comp_feat = form_clusters(features, 1-cos)
+            edges_feat, comp_feat = form_clusters(features, distance= euc)
             save(data = edges_feat, book=book_name, outpath=outpath_pickled, feat=True)
+
+
+        pdb.set_trace()
+
         
     #     edges_combined, components_combined = merge(edges_word, edges_feat, predictions)
 
