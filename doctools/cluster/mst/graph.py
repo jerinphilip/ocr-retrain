@@ -70,7 +70,7 @@ class Graph:
         for component in components:
             cset = set(component)
             assert(not (cset.intersection(included)))
-            included.union(cset)
+            included = included.union(cset)
 
 
 
