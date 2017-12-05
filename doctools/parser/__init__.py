@@ -48,8 +48,11 @@ def images_and_truths(udict, mapping_f):
         imgpath = os.path.join(prefix, imgloc)
         unit_images = extract_units(imgpath, units)
         #print(len(unit_images),  len(unit_truths))
-        result.append((unit_images, unit_truths))
-    return result
+        result.append(((unit_images, unit_truths), int(pno)))
+
+    result = sorted(result, key=lambda x: x[1])
+    required, pnos = list(zip(*result))
+    return required
 
 
 def read_book(**kwargs):
