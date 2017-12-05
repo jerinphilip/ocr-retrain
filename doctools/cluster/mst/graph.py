@@ -65,6 +65,15 @@ class Graph:
                 connected = dfs(u)
                 components.append(connected)
 
+        # Post computation assertions
+        included = set()
+        for component in components:
+            cset = set(component)
+            assert(not (cset.intersection(included)))
+            included.union(cset)
+
+
+
         return (new_edges, components)
 
     def matrix(self, **kwargs):
