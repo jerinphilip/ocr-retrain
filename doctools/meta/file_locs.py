@@ -13,6 +13,7 @@ path = {
 
 def get_pickeled(book_name, **kwargs):
 	flag = kwargs["type"]
+	edges_feat = None
 	if flag == "predictions":
 		if os.path.exists(os.path.join(path["pickle"],'%s.pkl'%book_name)):
 			print('Loading predictions...')
@@ -22,13 +23,12 @@ def get_pickeled(book_name, **kwargs):
 		else:
 			print("predictions do not exist...")
 	if flag == "edges":
-		if os.path.exists(os.path.join(path["pickle"],'%s.pkl'%book_name)):
+		if os.path.exists(os.path.join(path["pickle"],'%s.features_cluster.pkl'%book_name)):
 			print('Loading Edges...')
-			with open(os.path.join(path["pickle"],'%s_features_cluster.pkl'%book_name), 'rb') as f:
+			with open(os.path.join(path["pickle"],'%s.features_cluster.pkl'%book_name), 'rb') as f:
 				edges_feat = pickle.load(f)
-			return(edges_feat)
-		else:
-			print("edges do not exist...")
+		return(edges_feat)
+		
 
 def get_clusters(book_name, **kwargs):
 	features = kwargs["features"]
