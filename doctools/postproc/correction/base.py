@@ -1,7 +1,10 @@
 from .params import params
 from collections import Counter
 from copy import deepcopy
+import pdb
+from doctools.scripts.debug import time
 
+@time
 def naive(predictions, truths, dictionary):
     # Count number of errored words
     cost, errors = 0, 0
@@ -20,7 +23,7 @@ def naive(predictions, truths, dictionary):
 
     # Full typing cost
     return (cost, errors)
-
+@time
 def suggest(predictions, truths, dictionary):
     cost, errors = 0, 0
     for prediction, truth in zip(predictions, truths): 
@@ -39,7 +42,7 @@ def suggest(predictions, truths, dictionary):
                 errors += 1
     
     return (cost, errors)
-
+@time
 def cluster(predictions, truths, dictionary, components):
     cost, errors = 0, 0
 
@@ -48,21 +51,28 @@ def cluster(predictions, truths, dictionary, components):
 
     def get(array, indices):
         return [array[i] for i in indices]
-    
+    def get_indices(array, item):
+        indices=[]
+        for i, v in enumerate(array):
+            if item ==  v:
+                indices.append(i)
+        return indices
     def compute(component):
 
         # Obtain errored indices
         errored_indices = []
-        for i in components:
-            prediction, truth = predictions[i], truths[i]
+        cost, errors = 0, 0
+        for i in component:
+            # pdb.set_trace
+            prediction, truth = predictions[int(i)], truths[int(i)]
             if dictionary.error(prediction):
-                errored_indices.append(i)
+                errored_indices.append(int(i))
             else:
                 if prediction != truth:
                     errors += 1
 
         # Generate suggestions from component truths
-        cost, errors = 0, 0
+        
 
         indices = deepcopy(component)
         complete = False
@@ -79,17 +89,23 @@ def cluster(predictions, truths, dictionary, components):
             if count > 1:
                 # Find what's not equal to selection, leave it out.
                 left_out = []
-                for i in errored_indices:
-                    if predictions[i] != selection:
-                        left_out.append(i)
+                if selection in truths:
 
+                    for i in errored_indices:
+                        if predictions[i] != selection:
+                            left_out.append(i)
+                else:
+                    best_indices = get_indices(predictions, selection)
+                    left_out.extend(best_indices)
                 # Whatever's left out is errored_indices now
                 errored_indices = left_out
 
                 # Remove corrected from the component
                 for i in indices:
+                    # pdb.set_trace()
                     if predictions[i] == selection:
-                        indices.pop(i)
+                        indices.remove(i)
+
 
                 # Each batch correction costs this much from an annotator.
                 # This can be made proportional to the entries
