@@ -1,5 +1,6 @@
 from .params import params
 from collections import Counter
+from copy import deepcopy
 
 def naive(predictions, truths, dictionary):
     # Count number of errored words
@@ -49,6 +50,7 @@ def cluster(predictions, truths, dictionary, components):
         return [array[i] for i in indices]
     
     def compute(component):
+
         # Obtain errored indices
         errored_indices = []
         for i in components:
@@ -60,18 +62,58 @@ def cluster(predictions, truths, dictionary, components):
                     errors += 1
 
         # Generate suggestions from component truths
-        component_truths = get(truths, component) 
-        truths_counter = Counter(component_truths)
-        best = max(truths_counter.items(), key=lambda x: x[1])
-        selection, _ = best
         cost, errors = 0, 0
 
-        # TODO enhance this section with more complexity
-        for i in errored_indices:
-            if prediction[i] != selection:
-                errors += 1
+        indices = deepcopy(component)
+        complete = False
+        while not complete:
+            # From remaining indices, choose most frequent as the
+            # correct answer.
+            component_predictions = get(predictions, indices) 
+            predictions_counter = Counter(component_predictions)
+            best = max(predictions_counter.items(), key=lambda x: x[1])
+            selection, count = best
+            
+            # If they are all different, serves no purpose at all as
+            # well, no batch correction.
+            if count > 1:
+                # Find what's not equal to selection, leave it out.
+                left_out = []
+                for i in errored_indices:
+                    if predictions[i] != selection:
+                        left_out.append(i)
 
-        cost += params["cluster"]
+                # Whatever's left out is errored_indices now
+                errored_indices = left_out
+
+                # Remove corrected from the component
+                for i in indices:
+                    if predictions[i] == selection:
+                        indices.pop(i)
+
+                # Each batch correction costs this much from an annotator.
+                # This can be made proportional to the entries
+                cost += params["cluster"]
+
+                # How do we know when the process completes.
+                # Whatever is left out, is it correct at all, to choose a
+                # best?
+                ps = []
+                for i in left_out:
+                    possible = (truths[i] == predictions[i])
+                    ps.append(possible)
+
+                # If any of ps is true, possibility of correction.
+                complete = not any(ps)
+            else:
+                subpreds = get(predictions, errored_indices)
+                subtruths = get(truths, errored_indices)
+                _cost, _errors = suggest(subpreds, subtruths,
+                    dictionary)
+                cost += _cost
+                errors += _errors
+                complete = True
+
         return (cost, errors)
     
     cost, errors = 0, 0
