@@ -6,6 +6,7 @@ from collections import defaultdict
 from pprint import pprint
 import numpy as np
 from doctools.postproc.correction.params import params
+from doctools.cluster.mst import recluster
 
 def guarded_copy(src, dest):
     #print("rsync", src, dest)
@@ -46,19 +47,13 @@ def find_distance(book_id):
     base, imgs, truths = read_annotation(fpath)
 
     graph = get_pickeled(book_id, type='edges')
-    print(book_id)
 
-    def create_adj(edges, threshold):
-        adj = defaultdict(list)
-        for link in edges:
-            u, v = link
-            w = edges[link]
-            if w < threshold:
-                adj[u].append(v)
-                adj[v].append(u)
-        return adj
+    # n = sum([len(c) for c in graph["components"]])
+    n = 14686
+    print(len(truths), n)
+    input()
+    edges, components = recluster(graph["edges"], n, rep='components', threshold=0.2)
 
-    #adj = create_adj(graph["edges"], 0.2)
 
     occurrences = defaultdict(list)
 
@@ -83,14 +78,7 @@ def find_distance(book_id):
 
     print(np.mean(means), np.std(means))
 
-
-
-    
-
 if __name__ == '__main__':
-    book_id = '0005'
-    for book_id in params["books"]:
-        try:
-            find_distance(book_id)
-        except:
-            pass
+    book_id = '0061'
+    #for book_id in params["books"]:
+    find_distance(book_id)

@@ -22,25 +22,20 @@ def cluster(X, d, **kwargs):
     return G.matrix(**kwargs)
 
 
-def recluster(G, T):
-    edges = edges.keys()
+def recluster(G, n, **kwargs):
+    edges = G.keys()
     us, vs = list(zip(*edges))
-    vertices = set(us).union(set(vs))
-    n = len(vertices)
     NG = Graph(vertices=n)
-    for i in range(n):
-        for j in range(i+1, n):
-            x, y = vertices[i], vertices[j]
-            if (x, y) in G:
-                w = G[(x, y)]
-                NG.add_edge(i, j, w)
+    for (x, y) in G:
+        w = G[(x, y)]
+        NG.add_edge(x, y, w)
 
     options = {
-        'components': lambda : G.cluster(**kwargs),
-        'matrix': lambda : G.matrix(**kwargs)
+        'components': lambda : NG.cluster(**kwargs),
+        'matrix': lambda : NG.matrix(**kwargs)
     }
     if 'rep' in kwargs:
         return options.get(kwargs['rep'])()
-    return G.matrix(**kwargs)
+    return NG.matrix(**kwargs)
 
     
