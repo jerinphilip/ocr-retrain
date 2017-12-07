@@ -1,4 +1,4 @@
-from .params import params
+# from .params import params
 from .base import naive, suggest, cluster
 
 from doctools.scripts.opts import base_opts
@@ -33,13 +33,15 @@ def classify_errors(predictions, truths, em):
 	errors = [em.error(prediction) for prediction in predictions]
 	error_indices = [i for i,v in  enumerate(errors) if v != 0]
 	correct_indices = [i for i,v in  enumerate(errors) if v == 0]
-	
+	consistent_errors=[]
 	for index in correct_indices:
 		if predictions[index] == truths[index]:
 			correct+=1
 		else:
 			real_world_errors+=1
-	
+			inp = truths[index]
+			out = predictions[index]
+			consistent_errors.append([inp, out])
 	print("this will take time ..... :(")
 	for index in error_indices:
 		suggestions = em.suggest(predictions[index])
@@ -49,7 +51,7 @@ def classify_errors(predictions, truths, em):
 			uncorrectable += 1
 			em.enhance_vocabulary(truths[index])
 	print("oh!!! it's done... :D")
-	return correct, real_world_errors, correctable, uncorrectable
+	return correct, real_world_errors, correctable, uncorrectable, consistent_errors
 if __name__ == '__main__':
 	parser = ArgumentParser()
 	base_opts(parser)
@@ -62,47 +64,44 @@ if __name__ == '__main__':
 	outpath = args.output
 	# defining paths for books and predictions
 	book_index = args.book
-	book_list = params["books"]
-	for book_index in range(len(book_list)):
-		book_name = book_list[book_index]
-		# pdb.set_trace()
-		book_locs = list(map(lambda x: config["dir"] + x + '/', book_list))
-		
-		new_error_module = loov(book_locs, book_index, error_module)
+	book_list = config["books"]
+	# for book_index in range(len(book_list)):
+	book_name = book_list[book_index]
+	# pdb.set_trace()
+	book_locs = list(map(lambda x: config["dir"] + x + '/', book_list))
+	
+	new_error_module = loov(book_locs, book_index, error_module)
 
-		fpath = os.path.join(config["dir"], book_name)
-		print(book_name)
-		print("Reading book...", end='', flush=True)
-		pagewise = read_book(book_path=fpath, unit='word')
-		num_pages = int(len(pagewise))
-		print("Done")
-		images, truths = page_to_unit(pagewise)
-		# Load the predictions
-		predictions = get_pickeled(book_name, type="predictions")
-		correct, real_world_errors, correctable, uncorrectable = classify_errors(predictions, truths, new_error_module)
+	fpath = os.path.join(config["dir"], book_name)
+	
+	print("Reading book...%s"%book_name, end='', flush=True)
+	pagewise = read_book(book_path=fpath, unit='word')
+	num_pages = int(len(pagewise))
+	print("Done")
+	images, truths = page_to_unit(pagewise)
+	# Load the predictions
+	predictions = get_pickeled(book_name, type="predictions")
+	print(book_name)
+	if predictions and  get_clusters(book_name, features="images") and get_clusters(book_name, features="words") and get_clusters(book_name, features="combined"):
+		
+		correct, real_world_errors, correctable, uncorrectable, consistent_errors = classify_errors(predictions, truths, new_error_module)
 		# load clusters
-		
-		
-		# pdb.set_trace()
 		print("Calculating cost for Naive...")
 		cost_naive, error_naive = naive(predictions, truths, error_module)
 
 		print("Calculating cost for Suggest...")
 		cost_suggest, error_suggest = suggest(predictions, truths, new_error_module)
-		
-		print("Calculating cost for image clusters")
 		data = get_clusters(book_name, features="images")
+		print("Calculating cost for image clusters")
 		cost_cluster_images, error_cluster_images = cluster(predictions, truths, error_module, data)
-
-		print("Calculating cost for word clusters")
 		data = get_clusters(book_name, features="words")
+		print("Calculating cost for word clusters")
 		cost_cluster_words, error_cluster_words = cluster(predictions, truths, error_module, data)
-		print("Calculating cost for combined clusters")
 		data = get_clusters(book_name, features="combined")
+		print("Calculating cost for combined clusters")
 		cost_cluster_combined, error_cluster_combined = cluster(predictions, truths, error_module, data)
-		
 		print("Saving stats..")
-		cost_dict = { 	"Pages": num_pages,
+		cost_dict = {"Pages": num_pages,
 
 						"word stats":{
 						"correct": correct,
@@ -126,13 +125,18 @@ if __name__ == '__main__':
 							"words":error_cluster_words,
 							"images":error_cluster_images,
 							"combined":error_cluster_combined
-								}
-						}
-					
-		}
+								},
+						
+						}}
+
 		with open('%s/jsons_cost/%s.json'%(outpath, book_name), 'w+') as fp:
 			json.dump(cost_dict, fp, indent=4)
+		with open('%s/jsons_cost/%s_errors.txt'%(outpath, book_name), 'w+') as fp:
+			for i,k in enumerate(consistent_errors):
+				fp.write('%s: %s'%(consistent_errors[i][0], consistent_errors[i][1]))
 		print("finished..")
+	else:
+		print("json not available")
 		# print(cost_naive, error_naive)
 		# print (cost, error)
 		# print(cost_cluster, error_cluster)
