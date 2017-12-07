@@ -11,31 +11,33 @@ def operate(bookPath, outputDir):
         os.makedirs(outputDir)
     gtFileName = os.path.join(outputDir, 'annotation.txt')
     gtFile = codecs.open(gtFileName,'w',encoding='utf8')
+    print("Reading", bookPath)
     pagewise = read_book(book_path=bookPath, unit='word')
+    print("Done")
 
     pageNo = 0
     for page in pagewise:
         images, truths = page
         pageNo += 1
-        if len(images) == len (truths):
-            wordNo=0
-            for image in images: #if #images #truths mapping might go wrong
-                wordNo += 1
-                try:
-                    image = 255*image
-                    image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-                    wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
-                    wordImageName = os.path.join(outputDir, wordImageBaseName)
-                    wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
-                    cv2.imwrite(wordImageName, image)
-                    gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
-                except:
-                    image = np.zeros((32, 32))
-                    wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
-                    wordImageName = os.path.join(outputDir, wordImageBaseName)
-                    wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
-                    cv2.imwrite(wordImageName, image)
-                    gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
+        wordNo=0
+        for image in images: #if #images #truths mapping might go wrong
+            wordNo += 1
+            print(truths[wordNo-1])
+            try:
+                image = 255*image
+                image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+                wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                wordImageName = os.path.join(outputDir, wordImageBaseName)
+                wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                cv2.imwrite(wordImageName, image)
+                gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
+            except:
+                image = np.zeros((32, 32))
+                wordImageBaseName = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                wordImageName = os.path.join(outputDir, wordImageBaseName)
+                wordImageRelativePath = str(pageNo) + '_' +  str(wordNo) + '.jpg'
+                cv2.imwrite(wordImageName, image)
+                gtFile.write(wordImageRelativePath + ' ' + truths[wordNo-1] + '\n')
                     
 
 
