@@ -114,6 +114,7 @@ def cluster(predictions, truths, dictionary, components):
                 # Each batch correction costs this much from an annotator.
                 # This can be made proportional to the entries
                 # cost += params["cluster"]
+                print(len(left_out), len(added_in))
                 cost += params["deselection"] * len(left_out) + \
                         params["selection"] * len(added_in)
 
