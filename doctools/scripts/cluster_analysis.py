@@ -43,7 +43,7 @@ def foo(E, features, predictions, book):
 	df = pd.DataFrame(row, columns=['U', 'V', 'Dist'])
 	df = df.sort_values(by='Dist')
 	df.to_csv('results/%s_thresh.csv'%book)
-	print('Done.....')
+	print('Thresh computation Done.....')
 
 if __name__ == '__main__':
 	parser = ArgumentParser()
@@ -72,45 +72,33 @@ if __name__ == '__main__':
 	
 	ocr = GravesOCR(config["model"], config["lookup"])
 	error = Dictionary(**config["error"])
-	predictions = get_pickeled(book_name, type="predictions")
+	
 	edges = get_pickeled(book_name, type="edges")
-	foo(edges, features, predictions, book_name)
 	
 
-	# for book in books:
-	# 	print('%s book under process'%book)
-	# 	print(config["model"])
+	for book in books:
+		print('%s book under process'%book)
+		print(config["model"])
 		
-	# 	fpath = os.path.join(config["dir"], book)
-	# 	images, truths = get_units(fpath)
-	# 	if os.path.exists(os.path.join('%s'%outpath_pickled,'%s.pkl'%book)):
-	# 		print('Loading predictions...')
-	# 		with open(os.path.join('%s'%outpath_pickled,'%s.pkl'%book), 'rb') as f:
-	# 			predictions = pickle.load(f)
-	# 	try:
-	# 		with open('%s/%s.json'%(path,book), 'r') as json_data:
-	# 			data = json.load(json_data)
-	# 	except TypeError:
-	# 			print('%s/%s.json'%(path,book))
-	# 	val, key, row  = [],[], []
-	# 	# pdb.set_trace()
-	# 	for k,v in data.items():
+		fpath = os.path.join(config["dir"], book)
+		images, truths = get_units(fpath)
+		predictions = get_pickeled(book_name, type="predictions")
+		data = get_clusters(book_name, features="words")
+		val, key, row  = [],[], []
+		# pdb.set_trace()
+		for k,v in data.items():
 			
-	# 		err, corr = compare(k, v, predictions, error)
-	# 			# pdb.set_trace()
+			err, corr = compare(k, v, predictions, error)
+				# pdb.set_trace()
 				
-	# 		row.append([k,len(v), corr,  err])
-	# 	df = pd.DataFrame(row,  columns=['Exemplar','All', 'Correct','Error'])
-	# 	mean_all = np.ceil(np.mean(df['All']))
+			row.append([k,len(v), corr,  err])
+		df = pd.DataFrame(row,  columns=['Exemplar','All', 'Correct','Error'])
+		mean_all = np.ceil(np.mean(df['All']))
 		
-	# 	mean_correct = np.ceil(np.mean(df['Correct']))
-	# 	mean_error = np.ceil(np.mean(df['Error']))
-	# 	with open('results/%s_summary.txt'%book, 'w+') as f:
-	# 		f.write('Average no. of words in a cluster: %d \n Average correct words in a cluster:\
-	# 		 %.2f \n Average error in a cluster: %.2f \n'
-	# 			%(mean_all, mean_correct, mean_error))
-	# 	df = df.sort_values(by='All',  ascending=[0])
-	# 	# pdb.set_trace()
-	# 	df.to_csv('results/%s_feat_stats.csv'%book)
-	# 	print('Done.....')
+		mean_correct = np.ceil(np.mean(df['Correct']))
+		mean_error = np.ceil(np.mean(df['Error']))
+		df = df.sort_values(by='All',  ascending=[0])
+		# pdb.set_trace()
+		df.to_csv('results/%s_feat_stats.csv'%book)
+		print('Done.....')
 

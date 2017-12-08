@@ -4,10 +4,10 @@ params = {
     "verify": 5,
     "dropdown": 5,
     "ignore": 0,
-    "cluster": 60,
+    "cluster": 30,
 
     "books":[
-        "0175",
+        "0365",
         "0002",
         "0003",
         "0005",

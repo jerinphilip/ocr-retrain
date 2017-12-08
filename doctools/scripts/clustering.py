@@ -1,21 +1,25 @@
 import sys
 import os 
 import pdb
-src = os.path.abspath("../ocr/")
-sys.path.insert(0, '../src/doctools/')
 from doctools.cluster.mst import cluster
-from doctools.cluster.distance import jaccard, lev
+from doctools.cluster.distance import jaccard, lev, inv_jaccard
 from argparse import ArgumentParser
 from doctools.scripts.plot_tsne import tsne
 import numpy as np
 import pandas as pd
+from functools import partial
+
+def normal_lev(x, y):
+	return lev(x, y, normalized=True)
+
 parser = ArgumentParser()
 parser.add_argument('-f', '--file', required=True)
 
 args = parser.parse_args()
 
-words = open(args.file).read().splitlines()[:500]
-M = cluster(words, lev, threshold=8)
+words = open(args.file).read().splitlines()[:1000]
+
+M = cluster(words, normal_lev, threshold=8)
 
 
 # print(M)

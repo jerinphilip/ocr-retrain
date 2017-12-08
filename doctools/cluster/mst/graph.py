@@ -69,7 +69,8 @@ class Graph:
         included = set()
         for component in components:
             cset = set(component)
-            assert(not (cset.intersection(included)))
+            # assert(not (cset.intersection(included)))
+            print((cset.intersection(included)))
             included = included.union(cset)
 
 
