@@ -2,10 +2,11 @@ from doctools.cluster.mst import cluster, merge
 from doctools.cluster.distance import jaccard, lev, euc, cos
 from doctools.parser.convert import page_to_unit
 from doctools.meta.file_locs import get_pickeled, get_clusters
-from doctools.parser import webtotrain
+from doctools.cluster.k_nearest.distance import normalized_euclid_norm
+from doctools.parser import read_book
 from argparse import ArgumentParser
 from pprint import pprint
-from .dot import as_dot
+# from .dot import as_dot
 # from distance import levenshtein
 import json
 from functools import partial
@@ -33,14 +34,18 @@ def save(**kwargs):
     data = kwargs['data']
     meta = kwargs['book']
     loc = kwargs['outpath']
-    if not kwargs['feat']:
+    if kwargs['feat'] == "predictions":
         with open('%s/%s.pkl'%(loc, meta),'wb') as f:
             pickle.dump(data, f)
         print('Book predictions saved..')
-    else:
-        with open('%s/%s_features_cluster.pkl'%(loc, meta),'wb') as f:
+    if kwargs['feat'] == "images":
+        with open('%s/%s.features_cluster.pkl'%(loc, meta),'wb') as f:
             pickle.dump(data, f)
-        print('Book featutres saved..')
+        print('image featutres saved..')
+    if kwargs['feat'] == "words":
+        with open('%s/%s.words_cluster.pkl'%(loc, meta),'wb') as f:
+            pickle.dump(data, f)
+        print('words featutres saved..')    
 
 def visualize(path, components):
     with open(os.path.join(fpath, 'annotation.txt'), 'r') as in_file:
@@ -84,19 +89,19 @@ def k_nearest(fpath):
 @time
 def get_predictions(fpath):
     print("Reading book...", end='', flush=True)
-    pagewise = webtotrain.read_book(fpath)
+    pagewise = read_book(book_path=fpath, unit='word')
     
     print("Done")
     images, truths = page_to_unit(pagewise)
     print("Predicting....", end='', flush=True)
     predictions = ocr.predict(images)
-    print("Done")
+    print("Done")   
     errored = [predictions[i] for i in range(len(truths)) if predictions[i] != truths[i]]
     return errored, predictions
 
 def get_images(fpath):
     print("Reading book...", end='', flush=True)
-    pagewise = webtotrain.read_book(fpath)
+    pagewise = read_book(book_path=fpath, unit='word')
     print("Done")
     images, truths = page_to_unit(pagewise)
     return images, truths
@@ -110,8 +115,9 @@ def get_features(fpath):
 @time
 def form_clusters(elements, **kwargs):
     dist  = kwargs["distance"]
+    threshold = kwargs["threshold"]
     print("Clustering....", end='', flush=True)
-    edges, components = cluster(elements, dist, threshold=0.5, prune_above=0.8, rep='components')
+    edges, components = cluster(elements, dist, threshold=threshold,prune_above=0.8, rep='components')
     print("Done")
     return edges, components
 @time
@@ -140,10 +146,10 @@ if __name__ == '__main__':
     # Load OCR
     print(config["model"])
     ocr = GravesOCR(config["model"], config["lookup"])
-    book_list =['0022', '0029', '0040', '0060', '0061','0191', '0069', '0211']
+    # book_list =['0191', '0029', '0040', '0060', '0061', '0069', '0211']
     # book_list = ['0191']
     # Parse Book in and predict
-    book_name = book_list[args.book]
+    book_name = config["books"][args.book]
     outpath = args.output
     outpath_pickled = os.path.join(args.output, 'pickled')
     # # neigh = KNeighborsClassifier(n_neighbors=3)
@@ -153,29 +159,39 @@ if __name__ == '__main__':
     # k_nearest(os.path.join(config["feat_dir"], book_name))
     if len(images) == len(features):
 
-        predictions = get_pickeled(book_name, type="predictions")
-        # edges_word, comp_words = form_clusters(predictions, lev)
+        if get_pickeled(book_name, type="predictions")!=None:
+            predictions = get_pickeled(book_name, type="predictions")
+            edges_word, comp_words = form_clusters(predictions, distance=lev, threshold=0.5)
+            save(data = {"components": comp_words, "edges": edges_word},book=book_name, feat="words", outpath=outpath_pickled)
+        else:
+            print("predicting....")
+            predictions = ocr.predict(images)
+            edges_word, comp_words = form_clusters(predictions, distance=lev, threshold=0.5)
+            save(data = {"components": comp_words, "edges": edges_word},book=book_name, feat="words", outpath=outpath_pickled)
+            save(data=predictions, book=book_name, feat= "predictions", outpath=outpath_pickled)
         print("Into features now ..... :/ ")
         if get_pickeled(book_name, type="edges")!= None:
-            edges_feat = get_pickeled(book_name, type="edges")
-            
+            # data = get_pickeled(book_name, type="edges")
+            # edges_feat, comp_feat = data["edges"], data["components"]
+             edges_feat, comp_feat = form_clusters(features, distance= normalized_euclid_norm, threshold=0.36)
         else:
-            edges_feat, comp_feat = form_clusters(features, distance= euc)
-            save(data = edges_feat, book=book_name, outpath=outpath_pickled, feat=True)
-
-
-        pdb.set_trace()
+            edges_feat, comp_feat = form_clusters(features, distance= normalized_euclid_norm, threshold=0.36)
+            save(data = {"components":comp_feat,"edges":edges_feat}, book=book_name, outpath=outpath_pickled, feat="images")
 
         
-    #     edges_combined, components_combined = merge(edges_word, edges_feat, predictions)
-
-    #     exemplars = find_examplars(edges_combined)
+        edges_combined, components_combined = merge(edges_word, edges_feat, predictions)
         
-    #     mydict = dict(zip(list(exemplars), components_combined))
-    #     with open('%s/jsons/%s.json'%(outpath, book_name), 'w+') as fp:
-    #            json.dump(mydict, fp, indent=4)
-    # else:
-    #     print('for book %s features and images did not match'%book_name)
+        # exemplars = find_examplars(edges_feat)
+        
+        # mydict = dict(zip(list(exemplars), edges_feat))
+        with open('%s/jsons_word/%s.json'%(outpath, book_name), 'w+') as fp:
+               json.dump(comp_words, fp, indent=4)
+        with open('%s/jsons_feat/%s.json'%(outpath, book_name), 'w+') as fp:
+               json.dump(comp_feat, fp, indent=4)
+        with open('%s/jsons/%s.json'%(outpath, book_name), 'w+') as fp:
+               json.dump(components_combined, fp, indent=4)
+    else:
+        print('for book %s features and images did not match'%book_name)
 
 
     print("Finished...")
