@@ -42,6 +42,7 @@ def suggest(predictions, truths, dictionary):
                 errors += 1
     
     return (cost, errors)
+
 @time
 def cluster(predictions, truths, dictionary, components):
     cost, errors = 0, 0
@@ -51,12 +52,14 @@ def cluster(predictions, truths, dictionary, components):
 
     def get(array, indices):
         return [array[i] for i in indices]
+
     def get_indices(array, item):
         indices=[]
         for i, v in enumerate(array):
             if item ==  v:
                 indices.append(i)
         return indices
+
     def compute(component):
 
         # Obtain errored indices
@@ -89,27 +92,30 @@ def cluster(predictions, truths, dictionary, components):
             if count > 1:
                 # Find what's not equal to selection, leave it out.
                 left_out = []
-                if selection in truths:
+                added_in = []
 
-                    for i in errored_indices:
-                        if predictions[i] != selection:
-                            left_out.append(i)
-                else:
-                    best_indices = get_indices(predictions, selection)
-                    left_out.extend(best_indices)
+                for i in errored_indices:
+                    if predictions[i] != selection or \
+                            predictions[i] != truths[i]:
+                        left_out.append(i)
+                    else:
+                        added_in.append(i)
+
+
                 # Whatever's left out is errored_indices now
                 errored_indices = left_out
 
                 # Remove corrected from the component
                 for i in indices:
-                    # pdb.set_trace()
                     if predictions[i] == selection:
                         indices.remove(i)
 
 
                 # Each batch correction costs this much from an annotator.
                 # This can be made proportional to the entries
-                cost += params["cluster"]
+                # cost += params["cluster"]
+                cost += params["deselection"] * len(left_out) + \
+                        params["selection"] * len(added_in)
 
                 # How do we know when the process completes.
                 # Whatever is left out, is it correct at all, to choose a
@@ -121,6 +127,7 @@ def cluster(predictions, truths, dictionary, components):
 
                 # If any of ps is true, possibility of correction.
                 complete = not any(ps)
+
             else:
                 subpreds = get(predictions, errored_indices)
                 subtruths = get(truths, errored_indices)

@@ -5,6 +5,8 @@ params = {
     "dropdown": 5,
     "ignore": 0,
     "cluster": 30,
+    "selection": 0,
+    "deselection": 5,
 
     "books":[
         "0365",
