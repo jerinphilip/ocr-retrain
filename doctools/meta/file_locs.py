@@ -5,8 +5,8 @@ import pdb
 path = {
 		"pickle": {
 					"predictions":"/data5/deepayan/new_ocr/doctools/outdir/pickled/",
-					"features": "/data5/deepayan/new_ocr/doctools/outdir/backup/"
-					}
+					"features": "/data5/deepayan/new_ocr/doctools/outdir/pickled/"
+					},
 		"json":{
 				"words": "/data5/deepayan/new_ocr/doctools/outdir/jsons_word/",
 				"images": "/data5/deepayan/new_ocr/doctools/outdir/jsons_feat/",

@@ -1,6 +1,6 @@
 # from .params import params
 from .base import naive, suggest, cluster
-
+from doctools.cluster.mst import recluster
 from doctools.scripts.opts import base_opts
 from argparse import ArgumentParser
 from doctools.parser.convert import page_to_unit
@@ -52,6 +52,18 @@ def classify_errors(predictions, truths, em):
 			em.enhance_vocabulary(truths[index])
 	print("oh!!! it's done... :D")
 	return correct, real_world_errors, correctable, uncorrectable, consistent_errors
+
+
+def recompute_cost(book_name, predictions, truths, error_module):
+	data = get_pickeled(book_name, type="edges")
+	edges, components = data["edges"], data["components"]
+	for threshold in range(10, 36, 2):
+		threshold = threshold/100
+		# pdb.set_trace()
+		n_edges, n_components = recluster(edges, len(predictions), threshold=threshold, rep="components")
+		cost, errors = cluster(predictions, truths, error_module, n_components)
+		print("%.2f: %d"%(threshold, cost))
+		input()
 if __name__ == '__main__':
 	parser = ArgumentParser()
 	base_opts(parser)
@@ -82,6 +94,7 @@ if __name__ == '__main__':
 	# Load the predictions
 	predictions = get_pickeled(book_name, type="predictions")
 	print(book_name)
+	recompute_cost(book_name, predictions, truths, error_module)
 	if predictions and  get_clusters(book_name, features="images") and get_clusters(book_name, features="words") and get_clusters(book_name, features="combined"):
 		
 		correct, real_world_errors, correctable, uncorrectable, consistent_errors = classify_errors(predictions, truths, new_error_module)
@@ -101,6 +114,7 @@ if __name__ == '__main__':
 		print("Calculating cost for combined clusters")
 		cost_cluster_combined, error_cluster_combined = cluster(predictions, truths, error_module, data)
 		print("Saving stats..")
+		# pdb.set_trace()
 		cost_dict = {"Pages": num_pages,
 
 						"word stats":{
@@ -133,7 +147,7 @@ if __name__ == '__main__':
 			json.dump(cost_dict, fp, indent=4)
 		with open('%s/jsons_cost/%s_errors.txt'%(outpath, book_name), 'w+') as fp:
 			for i,k in enumerate(consistent_errors):
-				fp.write('%s: %s'%(consistent_errors[i][0], consistent_errors[i][1]))
+				fp.write('%s: %s \n'%(consistent_errors[i][0], consistent_errors[i][1]))
 		print("finished..")
 	else:
 		print("json not available")
