@@ -22,10 +22,9 @@ def cluster(X, d, **kwargs):
     return G.matrix(**kwargs)
 
 
-def merge(E1, E2, X):
-    n = len(X)
+def merge(E1, E2, n):
     f = Bijection()
-    G = Graph(vertices=len(X))
+    G = Graph(vertices=n)
     for link, weight in E1.items():
             
         u1, v1 = link
