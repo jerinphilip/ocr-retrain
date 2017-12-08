@@ -76,6 +76,7 @@ if __name__ == '__main__':
     print(config["model"])
     ocr = GravesOCR(config["model"], config["lookup"])
     book_name = config["books"][args.book]
+    print("Book:", book_name)
 
     outpath = args.output
     outpath_pickled = os.path.join(args.output, 'pickled')
