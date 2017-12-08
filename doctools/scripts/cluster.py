@@ -174,6 +174,8 @@ if __name__ == '__main__':
             # data = get_pickeled(book_name, type="edges")
             # edges_feat, comp_feat = data["edges"], data["components"]
              edges_feat, comp_feat = form_clusters(features, distance= normalized_euclid_norm, threshold=0.36)
+             save(data = {"components":comp_feat,"edges":edges_feat}, book=book_name, outpath=outpath_pickled, feat="images")
+
         else:
             edges_feat, comp_feat = form_clusters(features, distance= normalized_euclid_norm, threshold=0.36)
             save(data = {"components":comp_feat,"edges":edges_feat}, book=book_name, outpath=outpath_pickled, feat="images")
