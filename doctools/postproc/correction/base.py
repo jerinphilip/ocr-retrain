@@ -115,6 +115,7 @@ def cluster(predictions, truths, dictionary, components):
                 # This can be made proportional to the entries
                 # cost += params["cluster"]
                 print(len(left_out), len(added_in))
+                input()
                 cost += params["deselection"] * len(left_out) + \
                         params["selection"] * len(added_in)
 
