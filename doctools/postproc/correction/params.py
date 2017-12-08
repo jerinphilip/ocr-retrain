@@ -1,13 +1,15 @@
-
+from doctools.cluster.distance import jaccard, lev, euc, cos
+from doctools.cluster.k_nearest.distance import normalized_euclid_norm  
 params = {
     "type": 15,
     "verify": 5,
     "dropdown": 5,
     "ignore": 0,
     "cluster": 30,
-    "selection": 0,
+    "selection": 1,
     "deselection": 5,
-
+    
+    
     "books":[
         "0365",
         "0002",
@@ -75,3 +77,13 @@ params = {
 
 }
 
+cluster_params =  {
+        "words": {
+            "distance" : lev,
+            "threshold" : 0.5
+        },
+        "images": {
+            "distance": normalized_euclid_norm,
+            "threshold" : 0.36
+        }
+    }
