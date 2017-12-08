@@ -79,6 +79,8 @@ def cluster(predictions, truths, dictionary, components):
 
         indices = deepcopy(component)
         complete = False
+
+        n_added_in, n_left_out = 0, 0
         while not complete:
             # From remaining indices, choose most frequent as the
             # correct answer.
@@ -114,8 +116,8 @@ def cluster(predictions, truths, dictionary, components):
                 # Each batch correction costs this much from an annotator.
                 # This can be made proportional to the entries
                 # cost += params["cluster"]
-                print(len(left_out), len(added_in))
-                input()
+                n_left_out += len(left_out)
+                n_added_in += len(added_in)
                 cost += params["deselection"] * len(left_out) + \
                         params["selection"] * len(added_in)
 
@@ -139,6 +141,7 @@ def cluster(predictions, truths, dictionary, components):
                 errors += _errors
                 complete = True
 
+        print(n_added_in, n_left_out)
         return (cost, errors)
     
     cost, errors = 0, 0
