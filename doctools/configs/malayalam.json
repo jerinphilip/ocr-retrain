@@ -1,4 +1,4 @@
-{
+    {
     "model": "/users/jerin/ocr-retrain/doctools/parameters/models/Malayalam2.xml",
     "lookup": "/users/jerin/ocr-retrain/doctools/parameters/lookups/Malayalam.txt",
     "error": {
@@ -8,7 +8,9 @@
     },
 
     "dir": "/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/",
+    "feat_dir":"/OCRData2/praveen-intermediate" ,
     "books": [
+        "0175",
         "0002",
         "0003",
         "0004",
@@ -24,7 +26,6 @@
         "0109",
         "0128",
         "0135",
-        "0175",
         "0188",
         "0230",
         "0231",
