@@ -20,7 +20,7 @@ from collections import Counter
 from .debug import time
 import pickle
 import doctools.parser.cluster as pc
-
+from doctools.postproc.correction.params import cluster_params as params
 import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
@@ -92,16 +92,7 @@ if __name__ == '__main__':
         images, truths = get_images(fpath)
         return ocr.predict(images)
 
-    params = {
-        "words": {
-            "distance" : lev,
-            "threshold" : 0.5
-        },
-        "images": {
-            "distance": normalized_euclid_norm,
-            "threshold" : 0.36
-        }
-    }
+   
 
 
     loader = {

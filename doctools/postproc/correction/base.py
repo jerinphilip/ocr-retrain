@@ -66,7 +66,7 @@ def cluster(predictions, truths, dictionary, components):
         errored_indices = []
         cost, errors = 0, 0
         for i in component:
-            # pdb.set_trace
+            # pdb.set_trace()
             prediction, truth = predictions[int(i)], truths[int(i)]
             if dictionary.error(prediction):
                 errored_indices.append(int(i))
@@ -141,7 +141,7 @@ def cluster(predictions, truths, dictionary, components):
                 errors += _errors
                 complete = True
 
-        print(n_added_in, n_left_out)
+        # print(n_added_in, n_left_out)
         return (cost, errors)
     
     cost, errors = 0, 0
