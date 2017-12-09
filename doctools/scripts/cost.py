@@ -1,75 +1,66 @@
+import doctools.parser.cluster as pc
+from doctools.postproc.correction.params import cluster_params as params
+from argparse import ArgumentParser
+from .debug import time
+from .opts import base_opts
+from doctools.parser import read_book, text
+from doctools.parser.nlp import extract_words
 import json
-from .plot import plot
+from doctools.cluster.mst import recluster, merge
+import doctools.postproc.correction as cost
+from doctools.postproc.dictionary import Dictionary
 
-class Accounting:
-    def __init__(self):
-        self.U = set()
-        self.xs = []
-        self.ys = []
-        self.review = 0
-        self.nreview = 0
-
-    def account(self, **kwargs):
-        """
-        Receives the computed cost for promoted
-
-        """
-        if not self.U:
-            self.U = kwargs['excluded']
-
-        self.review += self.cost(kwargs['promoted'])
-        remaining = self.cost(kwargs['excluded'])
-        projected = self.review + remaining
-        self.xs.append(self.nreview)
-        self.ys.append(projected)
-
-    def promote(self, **kwargs):
-        self.nreview += len(kwargs['best'])
-        self.nprocessed += len(kwargs['promoted'])
-
-    def axes(self):
-        return (self.xs, self.ys)
-    
-    def cost(self, ls):
-        # ws = [
-        #    (False, False, False) 
-        #       => Incorrect at all three stages => 30 seconds
-        #    (False, False, True)
-        #       => Incorrect, but postproc saved => 5 seconds
-        #    (False, True)
-        #       => Incorrect, but postproc errored => Infinity
-        #    (True, False, False)   => Correct => 0 seconds
-        #    (True, False, True)    => Correct => 0 seconds
-        #    (True, True)           => Correct => 0 seconds
-        ws = [30, 5, 0, 0, 0, 0]
-        return sum([w*l for w,l in zip(ws, ls)])
-
-
-
-def f(path):
-    with open(path) as fp:
-        stats = json.load(fp)
-        methods = []
-        for method in stats:
-            log = Accounting()
-            cexcl = stats[method]["cost"]["excluded"]
-            cprom = stats[method]["cost"]["promoted"]
-            iprom = stats[method]["index"]["promoted"]
-            ibest = stats[method]["index"]["best"]
-            n = len(cexcl)
-            for t in range(n):
-                print("Best: %d, Promoted: %d"%( len(ibest[t]), len(iprom[t])))
-                log.promote(promoted=iprom[t])
-                log.account(excluded=cexcl[t], promoted=cprom[t])
-            #print(log.axes())
-            methods.append((method, log.axes()))
-        plot(methods, path + '.png')
+@time
+def enhance(book_locs, book_index, em):
+    full_text = '\n'.join(list(map(text, book_locs)))
+    words = extract_words(full_text)
+    em.enhance_vocab_with_books(words)
+    return em
 
 if __name__ == '__main__':
-    import sys, os
-    output = "/users/jerin/ocr-retrain/output/%s"%(sys.argv[1])
-    jsons = filter(lambda f: f.endswith(".json"), os.listdir(output))
-    for jsonfile in jsons:
-        path = os.path.join(output, jsonfile)
-        print(path)
-        f(path)
+    parser = ArgumentParser()
+    base_opts(parser)
+    args = parser.parse_args()
+    config_file = open(args.config)
+    config = json.load(config_file)
+
+    # Load OCR
+    print(config["model"])
+    #ocr = GravesOCR(config["model"], config["lookup"])
+    book_name = config["books"][args.book]
+    error_module = Dictionary(**config["error"])
+    book_list = config["books"]
+    book_locs = list(map(lambda x: config["dir"] + x + '/', book_list))
+    error_module = enhance(book_locs, args.book, error_module)
+
+    # Load predictions
+    data, status = pc.load(book_name, feat="ocr")
+    predictions, truths = data["predictions"], data["truths"]
+
+    _cost, _errors = cost.naive(predictions, truths, error_module)
+    print("Naive", _cost, _errors)
+
+    _cost, _errors = cost.suggest(predictions, truths, error_module)
+    print("Suggest", _cost, _errors)
+
+    data, status = pc.load(book_name, feat="images", **params["images"])
+    ei, ci = data["edges"], data["components"]
+    ei, ci = recluster(ei, data["vertices"], threshold=0.18, rep='components')
+
+    _cost, _errors = cost.cluster(predictions, truths, error_module, ci)
+    print("Images: ", _cost, _errors)
+
+    data, status = pc.load(book_name, feat="words", **params["words"])
+    ew, cw = data["edges"], data["components"]
+    #ew, cw = recluster(ew, data["vertices"], =0.1, rep='components')
+
+    _cost, _errors = cost.cluster(predictions, truths, error_module, cw)
+    print("Words", _cost, _errors)
+
+    ec, cc = merge(ew, ei, data["vertices"])
+    _cost, _errors = cost.cluster(predictions, truths, error_module, cc)
+    print("Combined", _cost, _errors)
+
+
+
+

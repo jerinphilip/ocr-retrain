@@ -22,8 +22,8 @@ path = {
 }
 
 def dict_equal(first, second):
-    pprint(first)
-    pprint(second)
+    # pprint(first)
+    # pprint(second)
     for key in first:
         if key not in second: return False
         elif first[key] != second[key]: return False
@@ -33,6 +33,7 @@ def load(book_name, **kwargs):
     base_dir = outdir('pickled')
     fname = "%s.%s.pkl"%(book_name, kwargs["feat"])
     fpath = os.path.join(base_dir, fname)
+    #print(fpath)
     params_path = fpath + '.params'
     if os.path.exists(fpath) and os.path.exists(params_path):
         with open(params_path, 'rb') as pfp:

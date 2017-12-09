@@ -2,9 +2,10 @@ from .params import params
 from collections import Counter
 from copy import deepcopy
 import pdb
+import sys
 from doctools.scripts.debug import time
 
-@time
+#@time
 def naive(predictions, truths, dictionary):
     # Count number of errored words
     cost, errors = 0, 0
@@ -23,7 +24,7 @@ def naive(predictions, truths, dictionary):
 
     # Full typing cost
     return (cost, errors)
-@time
+#@time
 def suggest(predictions, truths, dictionary):
     cost, errors = 0, 0
     for prediction, truth in zip(predictions, truths): 
@@ -43,7 +44,7 @@ def suggest(predictions, truths, dictionary):
     
     return (cost, errors)
 
-@time
+#@time
 def cluster(predictions, truths, dictionary, components):
     cost, errors = 0, 0
 
@@ -61,8 +62,8 @@ def cluster(predictions, truths, dictionary, components):
         return indices
 
     def compute(component):
-
         # Obtain errored indices
+        n_added_in, n_left_out = 0, 0
         errored_indices = []
         cost, errors = 0, 0
         for i in component:
@@ -80,7 +81,6 @@ def cluster(predictions, truths, dictionary, components):
         indices = deepcopy(component)
         complete = False
 
-        n_added_in, n_left_out = 0, 0
         while not complete:
             # From remaining indices, choose most frequent as the
             # correct answer.
@@ -88,6 +88,8 @@ def cluster(predictions, truths, dictionary, components):
             predictions_counter = Counter(component_predictions)
             best = max(predictions_counter.items(), key=lambda x: x[1])
             selection, count = best
+
+            print(best)
             
             # If they are all different, serves no purpose at all as
             # well, no batch correction.
@@ -141,13 +143,17 @@ def cluster(predictions, truths, dictionary, components):
                 errors += _errors
                 complete = True
 
-        # print(n_added_in, n_left_out)
-        return (cost, errors)
+        return (cost, errors, (n_added_in, n_left_out))
     
     cost, errors = 0, 0
+    n_added_in, n_left_out = 0, 0
     for component in components:
-        _cost, _errors = compute(component)
+        _cost, _errors, counts = compute(component)
         cost += _cost
         errors += _errors
+        _n_added_in, _n_left_out = counts
+        n_added_in += _n_added_in 
+        n_left_out += _n_left_out
 
+    print(n_added_in, n_left_out, file=sys.stderr)
     return (cost, errors)
