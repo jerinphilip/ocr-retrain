@@ -7,6 +7,8 @@ from pprint import pprint
 import numpy as np
 from doctools.postproc.correction.params import params
 from doctools.cluster.mst import recluster
+import doctools.parser.cluster as pc
+from doctools.postproc.correction.params import cluster_params as cparams
 
 def guarded_copy(src, dest):
     #print("rsync", src, dest)
@@ -22,23 +24,29 @@ def group(book_id):
     fpath = os.path.join(book_path, 'annotation.txt')
     base, imgs, truths = read_annotation(fpath)
 
-    graph = get_pickeled(book_id, type='edges')
-    group_path = os.path.join(base_path, "group", book_id)
-    guarded_mkdir(group_path)
 
-    print(len(graph["components"]))
-    input()
+    for feat in ["images", "words"]:
+        print(cparams[feat])
+        graph, changed = pc.load(book_id, feat=feat, **cparams[feat])
+        group_path = os.path.join(base_path, "group", book_id, feat)
+        guarded_mkdir(group_path)
 
-    for i, component in enumerate(graph["components"]):
-        # Create directory
-        component_path = os.path.join(group_path, str(i))
-        guarded_mkdir(component_path)
-        for j in component:
-            src = os.path.join(book_path, imgs[j])
-            guarded_copy(src, component_path)
-            #print(imgs[j], truths[j], j)
-            print(truths[j])
-        input()
+        components = sorted(graph["components"], key=len, reverse=True)
+
+        for i, component in enumerate(components):
+            print(len(component))
+            # Create directory
+            component_path = os.path.join(group_path, str(i))
+            guarded_mkdir(component_path)
+            for j in component:
+                try:
+                    src = os.path.join(book_path, imgs[j])
+                    guarded_copy(src, component_path)
+                    #print(imgs[j], truths[j], j)
+                    print(truths[j])
+                except IndexError:
+                    pass
+            input()
 
 def find_distance(book_id):
     base_path = '/OCRData2/praveen-intermediate/'
@@ -79,6 +87,7 @@ def find_distance(book_id):
     print(np.mean(means), np.std(means))
 
 if __name__ == '__main__':
-    book_id = '0061'
+    book_id = '0037'
     #for book_id in params["books"]:
-    find_distance(book_id)
+    #find_distance(book_id)
+    group(book_id)

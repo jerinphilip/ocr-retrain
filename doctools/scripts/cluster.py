@@ -28,39 +28,30 @@ from matplotlib import pyplot as plt
 
 @time
 def get_predictions(fpath):
-    print("Reading book...", end='', flush=True)
     pagewise = read_book(book_path=fpath, unit='word')
-    
-    print("Done")
     images, truths = page_to_unit(pagewise)
-    print("Predicting....", end='', flush=True)
     predictions = ocr.predict(images)
-    print("Done")   
     errored = [predictions[i] for i in range(len(truths)) if predictions[i] != truths[i]]
     return errored, predictions
 
 def get_images(fpath):
-    print("Reading book...", end='', flush=True)
     pagewise = read_book(book_path=fpath, unit='word')
-    print("Done")
     images, truths = page_to_unit(pagewise)
     return images, truths
 
 @time
 def get_features(fpath):
-    print('Loading features...')
     feat = np.load(os.path.join(fpath, "feats.npy"))
     features = [feat[i] for i in range(feat.shape[0])]
-    print('Done....')
     return features
 
 @time
 def form_clusters(elements, **kwargs):
     dist  = kwargs["distance"]
     threshold = kwargs["threshold"]
-    print("Clustering....", end='', flush=True)
-    edges, components = cluster(elements, dist, threshold=threshold,prune_above=0.8, rep='components')
-    print("Done")
+    prune_above = kwargs["prune_above"]
+    edges, components = cluster(elements, dist, 
+            threshold=threshold, prune_above=prune_above, rep='components')
     return edges, components
 
 
@@ -98,13 +89,13 @@ if __name__ == '__main__':
     loader = {
         "images":  feats,
         "words":  predict
-            
     }
 
     data = {}
-    for feat in params:
+    for feat in ["words", "images"]:
         X, changed = pc.load(book_name, **params[feat], feat=feat)
         if X is None or changed:
+            print("Clustering", feat)
             X = loader[feat](book_name)
             edges, components = form_clusters(X, feat=feat, **params[feat])
             data[feat] = {"components": components, "edges": edges, "vertices": len(X)}

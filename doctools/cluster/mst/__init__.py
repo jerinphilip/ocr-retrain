@@ -9,7 +9,6 @@ def cluster(X, d, **kwargs):
         for j in range(i+1, n):
             x, y = X[i], X[j]
             w = d(x, y)
-            #u, v = f(x), f(y)
             if w < kwargs['prune_above']:
                 G.add_edge(i, j, w)
 

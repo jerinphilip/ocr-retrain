@@ -1,1 +1,6 @@
-python3 -m doctools.scripts.run -c doctools/configs/malayalam.json -l ml -b 4 -o output/ -n 20
+for((i=0; i<31; i++))
+do
+    export SLURM_ARRAY_TASK_ID=$i
+    bash slurm-scripts/cluster.sbatch.sh
+done
+

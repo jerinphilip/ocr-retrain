@@ -1,5 +1,6 @@
 from doctools.cluster.distance import jaccard, lev, euc, cos
 from doctools.cluster.k_nearest.distance import normalized_euclid_norm  
+
 params = {
     "type": 15,
     "verify": 5,
@@ -80,10 +81,12 @@ params = {
 cluster_params =  {
         "words": {
             "distance" : lev,
-            "threshold" : 0.5
+            "threshold" : 0.5,
+            "prune_above": 0.6
         },
         "images": {
             "distance": normalized_euclid_norm,
-            "threshold" : 0.36
+            "threshold" : 0.35,
+            "prune_above": 0.36
         }
     }
