@@ -19,11 +19,16 @@ if __name__ == '__main__':
     ocr = GravesOCR(config["model"], config["lookup"])
     book_name = config["books"][args.book]
     print("Book:", book_name)
+    accs = []
+    for book_name in config["books"]:
+        try:
+            fpath = os.path.join(config["dir"], book_name)
+            data, status = pc.load(book_name, params={}, feat='ocr')
+            errors = len(data["errored"])
+            total = len(data["predictions"])
+            acc = (total-errors)/total
+            accs.append(acc)
+        except:
+            pass
 
-    fpath = os.path.join(config["dir"], book_name)
-    data, status = pc.load(book_name, params={}, feat='ocr')
-
-    errors = len(data["errored"])
-    total = len(data["predictions"])
-
-    print((total-errors)/total)
+    print(sum(accs)/len(accs))
