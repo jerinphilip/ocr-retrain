@@ -43,7 +43,7 @@ class Graph:
                 adj[v].append(u)
                 new_edges[link] = w
 
-        visited = dict([(u, 0) for u in adj])
+        visited = dict([(u, 0) for u in range(self.V)])
         # Do DFS on adj to get components
         def dfs(u):
             traversed = []
@@ -60,7 +60,7 @@ class Graph:
 
         components = []
             
-        for u in adj:
+        for u in range(self.V):
             if not visited[u]:
                 connected = dfs(u)
                 components.append(connected)

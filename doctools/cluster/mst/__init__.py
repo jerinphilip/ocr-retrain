@@ -34,6 +34,18 @@ def merge(E1, E2, n):
 
     return G.cluster(threshold=1)
 
+def intersection(E1, E2, n):
+    f = Bijection()
+    G = Graph(vertices=n)
+    for e1 in E1:
+        if e1 in E2:
+            u, v = e1
+            w = 1.0
+            # print(u, v, w)
+            G.add_edge(u, v, w)
+
+    return G.cluster(threshold=2.0)
+
 def recluster(G, n, **kwargs):
     edges = G.keys()
     us, vs = list(zip(*edges))
@@ -51,3 +63,13 @@ def recluster(G, n, **kwargs):
     return NG.matrix(**kwargs)
 
     
+
+def bugfixcomponents(components, vertices):
+    cs = components
+    full = set(range(vertices))
+    for component in components:
+        full = full - set(component)
+    for v in full:
+        cs.append([v])
+    return cs
+

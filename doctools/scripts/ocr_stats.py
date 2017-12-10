@@ -29,6 +29,7 @@ if __name__ == '__main__':
             acc = (total-errors)/total
             accs.append(acc)
         except:
+            print(book_name)
             pass
 
     print(sum(accs)/len(accs))
