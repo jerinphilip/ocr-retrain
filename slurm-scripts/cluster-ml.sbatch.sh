@@ -4,7 +4,7 @@
 #SBATCH --partition=atom-cpu
 #SBATCH --output=log/%j.out
 #SBATCH --array=0-31
-#SBATCH --mem=8G
+#SBATCH --mem=23G
 #SBATCH -n 1
 #SBATCH --overcommit
 set -x

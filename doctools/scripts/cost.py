@@ -7,7 +7,8 @@ from doctools.parser import read_book, text
 from doctools.parser.nlp import extract_words
 import json
 from doctools.cluster.mst import recluster, merge, intersection, bugfixcomponents
-import doctools.postproc.correction as cost
+#import doctools.postproc.correction as cost
+import doctools.simulate.correction as cost
 from doctools.postproc.dictionary import Dictionary
 
 # cost.naive = lambda *a, **kw: (0, 0)
@@ -69,7 +70,7 @@ if __name__ == '__main__':
             data, status = pc.load(book_name, feat="images", **params["images"])
             ei, ci = data["edges"], data["components"]
             ci = bugfixcomponents(ci, data["vertices"])
-            ei, ci = recluster(ei, data["vertices"], threshold=0.05, rep='components')
+            ei, ci = recluster(ei, data["vertices"], threshold=0.15, rep='components')
 
             _cost, _errors = cost.cluster(predictions, truths, error_module, ci)
             print("Images: ", _cost, _errors)

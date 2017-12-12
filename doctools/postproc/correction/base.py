@@ -46,114 +46,100 @@ def suggest(predictions, truths, dictionary):
 
 #@time
 def cluster(predictions, truths, dictionary, components):
-    cost, errors = 0, 0
-
-    # Group predictions by components.
-    # Assume all gets corrected in one go.
-
-    def get(array, indices):
-        return [array[i] for i in indices]
-
-    def get_indices(array, item):
-        indices=[]
-        for i, v in enumerate(array):
-            if item ==  v:
-                indices.append(i)
-        return indices
-
     def compute(component):
         # Obtain errored indices
-        n_added_in, n_left_out = 0, 0
-        errored_indices = []
-        cost, errors = 0, 0
-        for i in component:
-            # pdb.set_trace()
-            prediction, truth = predictions[int(i)], truths[int(i)]
-            if dictionary.error(prediction):
-                errored_indices.append(int(i))
-            else:
-                if prediction != truth:
-                    errors += 1
 
-        # Generate suggestions from component truths
-        
+        def get(array, indices):
+            return [array[i] for i in indices]
 
-        indices = deepcopy(component)
-        complete = False
+        def detect(cs):
+            _errors = 0
+            errored_indices = []
+            for i in cs:
+                prediction, truth = predictions[i], truths[i]
+                if dictionary.error(prediction):
+                    errored_indices.append(i)
+                else:
+                    if prediction != truth:
+                        _errors += 1
+            return (set(errored_indices), _errors)
 
-        while not complete:
-            # From remaining indices, choose most frequent as the
-            # correct answer.
-            component_predictions = get(predictions, indices) 
+        def check(i):
+            correct = (truths[i] == predictions[i])
+            eq_select = (selection == predictions[i])
+            return (correct and eq_select)
+
+        def select(remaining, selection):
+            icheck = lambda i: not check(i)
+            selected = set(filter(check, remaining))
+            return selected
+
+        def candidate(pool):
+            if not pool:
+                return (None, 0)
+            component_predictions = get(predictions, pool) 
             predictions_counter = Counter(component_predictions)
             best = max(predictions_counter.items(), key=lambda x: x[1])
             selection, count = best
+            return selection, count
 
-            print(best)
+        def fpool(pool, selection, selected):
+            for i, pred in enumerate(predictions):
+                if pred == selection and i in pool:
+                    pool.remove(i)
+            pool = pool - selected
+            return pool
+
+        def batch_correctable(errored, pool):
+            selection, count = candidate(pool)
+            if count <= 1:
+                return False
             
-            # If they are all different, serves no purpose at all as
-            # well, no batch correction.
-            if count > 1:
-                # Find what's not equal to selection, leave it out.
-                left_out = []
-                added_in = []
+            # At least one prediction needs to be equal to selection.
+            for i in errored:
+                if selection == predictions[i]:
+                    return True
 
-                for i in errored_indices:
-                    if predictions[i] != selection or \
-                            predictions[i] != truths[i]:
-                        left_out.append(i)
-                    else:
-                        added_in.append(i)
+            return False
 
 
-                # Whatever's left out is errored_indices now
-                errored_indices = left_out
 
-                # Remove corrected from the component
-                for i in indices:
-                    if predictions[i] == selection:
-                        indices.remove(i)
+        ccost, cerrors = 0, 0
+        errored, rwe = detect(component)
+        cerrors += rwe
+        pool = set(deepcopy(component))
 
+        selected, deselected = set(), set()
+        while True:
+            selection, count = candidate(pool)
+            selected = select(errored, selection)
+            deselected = errored - selected
+            pool = fpool(pool, selection, selected)
+            
+            #ccost += params["deselection"] * len(deselected) + \
+                    #params["selection"] * len(selected)
+            ccost += params["selection"]*len(selected)
 
-                # Each batch correction costs this much from an annotator.
-                # This can be made proportional to the entries
-                # cost += params["cluster"]
-                n_left_out += len(left_out)
-                n_added_in += len(added_in)
-                cost += params["deselection"] * len(left_out) + \
-                        params["selection"] * len(added_in)
+            errored = deselected
+            #assert(errored.intersection(pool) == errored)
+            if not batch_correctable(errored, pool):
+                break
 
-                # How do we know when the process completes.
-                # Whatever is left out, is it correct at all, to choose a
-                # best?
-                ps = []
-                for i in left_out:
-                    possible = (truths[i] == predictions[i])
-                    ps.append(possible)
+        subpreds = get(predictions, deselected)
+        subtruths = get(truths, deselected)
+        _cost, _errors = suggest(subpreds, subtruths,
+            dictionary)
+        ccost += _cost
+        cerrors += _errors
+        complete = True
 
-                # If any of ps is true, possibility of correction.
-                complete = not any(ps)
-
-            else:
-                subpreds = get(predictions, errored_indices)
-                subtruths = get(truths, errored_indices)
-                _cost, _errors = suggest(subpreds, subtruths,
-                    dictionary)
-                cost += _cost
-                errors += _errors
-                complete = True
-
-        return (cost, errors, (n_added_in, n_left_out))
+        return (ccost, cerrors)
     
-    cost, errors = 0, 0
-    n_added_in, n_left_out = 0, 0
+    fcost,ferrors = 0, 0
     for component in components:
-        _cost, _errors, counts = compute(component)
-        cost += _cost
-        errors += _errors
-        _n_added_in, _n_left_out = counts
-        n_added_in += _n_added_in 
-        n_left_out += _n_left_out
+        _cost, _errors, = compute(component)
+        fcost += _cost
+        ferrors += _errors
 
-    print(n_added_in, n_left_out, file=sys.stderr)
-    return (cost, errors)
+    #print(n_added_in, n_left_out, file=sys.stderr)
+    return (fcost, ferrors)

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import doctools.parser.cluster as pc
 from doctools.postproc.correction.params import cluster_params as params
 
@@ -21,52 +21,75 @@ def _d3(cluster, text):
         return len(ls)
 
     def connect(component, edges):
+        _edges = {}
         n = len(component)
-        print(n)
+        # print(n)
         E = 0
         for i in range(n):
             for j in range(i+1, n):
                 v, u = component[i], component[j]
+                assert (not ((v, u) in edges and (u, v) in edges))
                 if (v, u) in edges:
+                    _edges[(v, u)] = edges[(v, u)]
+                    E += 1
+                if (u, v) in edges:
+                    _edges[(u, v)] = edges[(u, v)]
                     E += 1
 
         for i in range(n):
             for j in range(i+1, n):
                 if E < n-1:
                     v, u = component[i], component[j]
-                    edges[(v, u)] = 1
-                    E += 1
+                    if (v, u) not in edges and (u, v) not in edges:
+                        _edges[(v, u)] = 1
+                        edges[(v, u)] = 1
+                        E += 1
                 else:
-                    return edges
+                    return _edges
 
 
     
+    # Fix components, edges
+    # Must have >= 4 errors.
+
+    def errored(component):
+        err = lambda i: i in indices
+        ls = filter(err, component)
+        return list(ls)
+
     threshold = 4
-    #components = sorted(cluster["components"], key=_ecount)
     components = cluster["components"]
     components = list(filter(lambda x: _ecount(x) >= threshold, components))
+    components = list(map(errored, components))
     edges = cluster["edges"]
-    for component in components:
-        edges = connect(component, edges)
+    _edges = {}
 
+    for component in components:
+        es = connect(component, edges)
+        print("Components:", len(component), "Edges:", len(es))
+        _edges.update(es)
+
+    # Generate integer labels
     counter = 0
     d = {}
+    for component in components:
+        for v in component:
+            if not v in d:
+                d[v] = counter
+                counter = counter+1
+
     for i, c in enumerate(components):
         for v in c:
-            if v in indices:
-                if not v in d:
-                    d[v] = counter
-                    counter = counter+1
-                node = {"name": truths[v], "group": i}
-                nodes.append(node)
+            label = '{}/{}'.format(predictions[v], truths[v])
+            node = {"name": label, "group": i}
+            nodes.append(node)
 
-    for e in edges:
+    for e in _edges:
         u, v = e
-        if u in d and v in d:
-            w = edges[e]
-            w = int(100*w)
-            link = {"source": d[u], "target": d[v], "value": w, "weight": w}
-            links.append(link)
+        w = _edges[e]
+        w = int(100*w)
+        link = {"source": d[u], "target": d[v], "value": w, "weight": w}
+        links.append(link)
 
 
     return {"nodes": nodes, "links": links}
@@ -77,9 +100,12 @@ def _d3(cluster, text):
 
 
 
-@app.route('/<book>/')
+@app.route('/<book>/', methods=['GET'])
 def correct(book):
+    if request.args.get('rep') == 'tree':
+        return render_template('tree.html')
     return render_template('main.html')
+
 
 @app.route('/<book>/graph')
 def graph(book):
