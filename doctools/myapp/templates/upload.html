@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %} Upload File {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="six columns">
+            .
+        </div>
+        <div class="six columns">
+            <form method="post" enctype="multipart/form-data">
+                <div class="row">
+                    <input type="file" name="input_image" accept="image/*">
+                </div>
+                <div class="row">
+                    <div class="eight columns">
+                        <select name="lang">
+                            {% for lang in langs %}
+                                <option>{{ lang.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="four columns">
+                        <input type="submit">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+

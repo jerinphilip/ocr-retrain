@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %} Gallery {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="six columns"> 
+            <div>
+            <p> The present growth of digitization of documents demands an immediate solution
+            to enable the archived valuable materials searchable and usable by users in
+            order to achieve its objective. Our team has developed robust and efficient
+            solutions to full the objectives.  </p>
+
+            <p>A web framework for optical character
+            recognition on 15 Indic scripts as well as English has been introduced. This
+            web framework can be used by everyone for text recognition free-of-cost. An API
+            has also been introduced to be used as 3rd tool in standalone applications or
+            otherwise. </p>
+            </div>
+
+            <div class="twelve columns">
+                <a class="button button-primary u-full-width" href="/enqueue">Queue</a>
+                <a class="button button-primary u-full-width" href="/view">View</a>
+            </div>
+        </div>
+
+        <div class="six columns">
+            <div>
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" 
+                    width="200" height="200"/>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
