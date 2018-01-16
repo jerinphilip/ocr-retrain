@@ -1,0 +1,21 @@
+{
+    "model": "/OCRData2/minesh.mathew/Experiments/IJDAR/raw_word/English/Train_Test/testing_nn_1.xml",
+    "books": [
+        "1501",
+        "1503",
+        "1513",
+        "1601",
+        "2001",
+        "2002",
+        "2003"
+    ],
+
+    "lookup": "/data5/deepayan/new_ocr/doctools/parameters/lookups/English.txt",
+    "dir": "/OCRData2/english/ANN_OCR/",
+    "feat_dir": "/OCRData2/praveen-intermediate",
+    "error": {
+        "alphabet": "/data5/deepayan/new_ocr/doctools/parameters/error/English/alphabet", 
+        "save": "/data5/deepayan/new_ocr/doctools/parameters/error/English/save_crawled", 
+        
+    }
+}
