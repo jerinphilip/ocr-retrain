@@ -1,5 +1,6 @@
 # from .params import params
-from .base import naive, suggest, cluster from doctools.cluster.mst import recluster
+from .base import naive, suggest, cluster 
+from doctools.cluster.mst import recluster
 from doctools.scripts.opts import base_opts
 from argparse import ArgumentParser
 from doctools.parser.convert import page_to_unit
