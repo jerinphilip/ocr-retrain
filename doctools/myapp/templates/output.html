@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %} Gallery {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="six columns">
+            <img src="{{ url_for('download_file', filename=image.fname) }}">
+        </div>
+        <div class="six columns">
+            <pre>
+                {{output.output}}
+            </pre>
+        </div>
+    </div>
+{% endblock %}
+

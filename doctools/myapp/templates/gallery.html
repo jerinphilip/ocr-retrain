@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %} Gallery {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="six columns">
+            <h4>Completed</h4>
+            <ol>
+            {% for img, text, id in completed %}
+                <li><a href="{{ url_for("result", output_id=id)}}">{{img}}</a></li>
+            {% endfor %}
+            </ol>
+        </div>
+        <div class="six columns">
+            <h4>Pending</h4>
+            <ol>
+            {% for img in pending %}    
+                <li>{{ img.fname }}</li>
+            {% endfor %}
+            </ol>
+        </div>
+    </div>
+{% endblock %}
+
