@@ -67,31 +67,47 @@ if __name__ == '__main__':
             CE.append(entry)
 
             # Images Features
-            data, status = pc.load(book_name, feat="images", **params["images"])
-            ei, ci = data["edges"], data["components"]
-            ci = bugfixcomponents(ci, data["vertices"])
-            ei, ci = recluster(ei, data["vertices"], threshold=0.15, rep='components')
 
-            _cost, _errors = cost.cluster(predictions, truths, error_module, ci)
-            print("Images: ", _cost, _errors)
-            entry = (book_name, _cost, _errors, "images")
+            entry = None
+            bei, bci = None, None
+            for t in range(36, 0, -1):
+                data, status = pc.load(book_name, feat="images", **params["images"])
+                ei, ci = data["edges"], data["components"]
+                ci = bugfixcomponents(ci, data["vertices"])
+                threshold = t/100;
+                ei, ci = recluster(ei, data["vertices"], threshold=threshold, rep='components')
+
+                _cost, _errors = cost.cluster(predictions, truths, error_module, ci)
+                if (entry is None) or (entry[2] < _cost):
+                    print("Images: ", _cost, _errors, t)
+                    bei, bci = ei, ci
+                    entry = (book_name, _cost, _errors, "images")
+
             CE.append(entry)
 
 
             # Word Features
-            data, status = pc.load(book_name, feat="words", **params["words"])
-            ew, cw = data["edges"], data["components"]
-            cw = bugfixcomponents(cw, data["vertices"])
-            #ew, cw = recluster(ew, data["vertices"], threshold=0.1, rep='components')
+            entry = None
+            bew, bcw = None, None
+            for t in range(60, 0, -1):
+                data, status = pc.load(book_name, feat="words", **params["words"])
+                ew, cw = data["edges"], data["components"]
+                cw = bugfixcomponents(cw, data["vertices"])
+                threshold = t/100;
+                ew, cw = recluster(ew, data["vertices"], threshold=threshold, rep='components')
+                print(len(ew))
 
-            _cost, _errors = cost.cluster(predictions, truths, error_module, cw)
-            print("Words", _cost, _errors)
-            entry = (book_name, _cost, _errors, "words")
+                _cost, _errors = cost.cluster(predictions, truths, error_module, cw)
+                if (entry is None) or (entry[2] < _cost):
+                    print("Words", _cost, _errors, t)
+                    bew, bcw = ew, cw
+                    entry = (book_name, _cost, _errors, "images")
+
             CE.append(entry)
 
 
             # Combined features
-            ec, cc = merge(ew, ei, data["vertices"])
+            ec, cc = merge(bew, bei, data["vertices"])
             cc = bugfixcomponents(cc, data["vertices"])
             _cost, _errors = cost.cluster(predictions, truths, error_module, cc)
             print("Combined", _cost, _errors)
@@ -104,9 +120,10 @@ if __name__ == '__main__':
             print("Intersection", _cost, _errors)
             entry = (book_name, _cost, _errors, "intersection")
             CE.append(entry)
-        except:
-            raise
+        except Exception as e:
             print("Book", book_name, "failed")
+            print(e)
+            raise e
 
 
     #  es = []

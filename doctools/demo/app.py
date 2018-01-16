@@ -1,10 +1,62 @@
 from flask import Flask, render_template, jsonify, request
 import doctools.parser.cluster as pc
 from doctools.postproc.correction.params import cluster_params as params
+from doctools.cluster.mst import recluster
+import random
+from collections import defaultdict
 
 app = Flask(__name__)
 
 group_path = '/OCRData2/praveen-intermediate/group/'
+
+
+def connect(component, edges):
+    _edges = {}
+    n = len(component)
+    adj = defaultdict(list)
+    for i in range(n):
+        for j in range(i, n):
+            u, v = component[i], component[j]
+            if (u, v) in edges:
+                mu, mv = min(u, v), max(u, v)
+                _edges[(mu, mv)] = edges[(u, v)]
+                adj[u].append(v)
+                adj[v].append(u)
+    # Not everything would me connected.
+    # Magic should convert this into a tree, preserving original edges.
+    visited = dict([(u, 0) for u in component])
+    subcomponents = []
+
+    def dfs(_u):
+        stack = [_u]
+        traversed = []
+        while stack:
+            u = stack.pop()
+            traversed.append(u)
+            visited[u] = 2
+            for v in adj[u]:
+                if visited[v] == 0:
+                    visited[v] = 1
+                    stack.append(v)
+        return traversed
+
+
+    for u in component:
+        if not visited[u]:
+            subcomponents.append(dfs(u))
+
+    
+    for i in range(len(subcomponents)-1):
+        cu = subcomponents[i]
+        cv = subcomponents[i+1]
+
+        # Connect cu and cv
+
+        _u, _v = random.choice(cu), random.choice(cv)
+        u, v = min(_u, _v), max(_u, _v)
+        _edges[(u, v)] = 1
+    return _edges
+
 
 
 def _d3(cluster, text):
@@ -14,53 +66,20 @@ def _d3(cluster, text):
     truths = text["truths"]
     nodes = []
     links = []
-
+    lbt, ubt = 2, 50
     def _ecount(cs):
         errored = lambda x: x in indices
         ls = list(filter(errored, cs))
         return len(ls)
-
-    def connect(component, edges):
-        _edges = {}
-        n = len(component)
-        # print(n)
-        E = 0
-        for i in range(n):
-            for j in range(i+1, n):
-                v, u = component[i], component[j]
-                assert (not ((v, u) in edges and (u, v) in edges))
-                if (v, u) in edges:
-                    _edges[(v, u)] = edges[(v, u)]
-                    E += 1
-                if (u, v) in edges:
-                    _edges[(u, v)] = edges[(u, v)]
-                    E += 1
-
-        for i in range(n):
-            for j in range(i+1, n):
-                if E < n-1:
-                    v, u = component[i], component[j]
-                    if (v, u) not in edges and (u, v) not in edges:
-                        _edges[(v, u)] = 1
-                        edges[(v, u)] = 1
-                        E += 1
-                else:
-                    return _edges
-
-
-    
-    # Fix components, edges
-    # Must have >= 4 errors.
-
     def errored(component):
         err = lambda i: i in indices
         ls = filter(err, component)
         return list(ls)
-
-    threshold = 4
     components = cluster["components"]
-    components = list(filter(lambda x: _ecount(x) >= threshold, components))
+    components = list(filter(lambda x: _ecount(x) >= lbt, components))
     components = list(map(errored, components))
+    samples = min(len(components), 10) 
+    components = random.sample(components, samples)
     edges = cluster["edges"]
     _edges = {}
 
@@ -111,6 +130,14 @@ def correct(book):
 def graph(book):
     feat = 'images'
     cluster, status = pc.load(book, feat=feat, **params[feat])
+    e, c = recluster(cluster["edges"], cluster["vertices"], threshold=0.15
+            , rep = 'components')
+    print(e, c)
+    cluster = {
+        "edges": e,
+        "components": c,
+        "vertices": cluster["vertices"]
+    }
     feat = 'ocr'
     text, status = pc.load(book, feat=feat)
     return jsonify(_d3(cluster, text))
