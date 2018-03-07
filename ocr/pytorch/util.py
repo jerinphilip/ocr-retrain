@@ -1,7 +1,12 @@
 import torch
 import numpy as np
 from collections import namedtuple
-
+import pdb
+from functools import wraps
+from time import time as _timenow 
+from sys import stderr
+import os
+import pickle
 def gpu_format(label_map):
     def ocr_ready(seq_targ):
         seq, targ = seq_targ
@@ -14,6 +19,59 @@ def gpu_format(label_map):
         return (seq, targ)
     return ocr_ready
 
+def time(f):
+    @wraps(f)
+    def _wrapped(*args, **kwargs):
+        start = _timenow()
+        result = f(*args, **kwargs)
+        end = _timenow()
+        print('[time] {}: {}'.format(f.__name__, end-start),
+                file=stderr)
+        return result
+    return _wrapped
+
+def outdir(*names):
+    base_dir = '/data5/deepayan/ocr-retrain/'
+    return os.path.join(base_dir, *names)
+def gmkdir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def save(**kwargs):
+    base_dir = outdir('pickled')
+    data = kwargs['data']
+    meta = kwargs['book']
+    gmkdir(base_dir)
+    fname = "%s.%s.pkl"%(meta, kwargs["feat"])
+    fpath = os.path.join(base_dir, fname)
+    with open(fpath, "wb+") as f:
+        pickle.dump(data, f)
+        print("Saving:", kwargs["feat"])
+
+def load(**kwargs):
+    base_dir = outdir('pickled')
+    meta = kwargs['book']
+    fname = "%s.%s.pkl"%(meta, kwargs["feat"])
+    fpath = os.path.join(base_dir, fname)
+    if os.path.exists(fpath):
+        with open(fpath, 'rb') as fp:
+            saved = pickle.load(fp)
+            return saved
+    else:
+        return None
+def split(samples, **kwargs):
+    total = len(samples)
+    indices = list(range(total))
+    if kwargs['random']:
+        np.random.shuffle(indices) 
+    percent = kwargs['split']
+    # Split indices
+    current = 0
+    train_count = np.int(percent*total)
+    train_indices = indices[current:current+train_count]
+    current += train_count
+    test_indices = indices[current:]
+    return list(map(lambda i: samples[i], train_indices)), list(map(lambda i: samples[i], test_indices))
 
 def bucket(data, **kwargs):
     max_size = 32768

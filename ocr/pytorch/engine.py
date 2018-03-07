@@ -8,7 +8,7 @@ from random import shuffle
 from tqdm import tqdm
 from random import shuffle
 from math import ceil
-
+import pdb
 class Engine:
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -25,7 +25,6 @@ class Engine:
         for key in self.optim_params:
             if key in kwargs:
                 self.optim_params[key] = kwargs[key]
-
         if 'state_dict' not in kwargs:
             self.model.cuda()
             self.optimizer = optim.SGD(self.model.parameters(), **self.optim_params)
@@ -44,12 +43,9 @@ class Engine:
         seq = seq.cuda()
         seq = Variable(seq, requires_grad=False)
         target = Variable(target, requires_grad=False)
-
         # Feedforward
         net_output = self.model(seq)
         prediction = net_output.contiguous()
-    
-        # Sizes
         target_sizes = Variable(torch.IntTensor([target.size(0)]), 
                 requires_grad=False)
         pred_sizes = Variable(torch.IntTensor([prediction.size(0)]), 
@@ -70,13 +66,12 @@ class Engine:
     def export(self):
         self._kwargs['state_dict'] = self.model.state_dict()
         return self._kwargs
-
     def train(self, train_set, **kwargs):
         self.model.train()
 
         defaults =  {
-            'max_epochs': 45,
-            'expected_loss': 35.0,
+            'max_epochs': 25,
+            'expected_loss': 55.0,
         }
 
         for key in defaults:
@@ -87,14 +82,14 @@ class Engine:
         f = lambda x: x
         if 'debug' in kwargs and kwargs['debug']:
             f = tqdm
-
         epoch = 0
         validation_loss = float('inf')
         while epoch < kwargs['max_epochs'] \
                 and validation_loss > kwargs['expected_loss']:
 
             epoch = epoch + 1
-            train_subset, validation_subset = self._split(train_set)
+            print('Epochs:[%d]/[%d]'%(epoch, kwargs['max_epochs']))
+            train_subset, validation_subset = self._split(train_set, method='random')
 
             # Training
             avgTrain = AverageMeter("train loss")
@@ -103,23 +98,23 @@ class Engine:
                 avgTrain.add(loss)
 
             print(avgTrain, flush=True)
-
             # Validation
             avgValidation = AverageMeter("validation loss")
             for pair in f(validation_subset):
                 loss = self.train_subroutine(pair, validation=True)
                 avgValidation.add(loss)
             print(avgValidation, flush=True)
-
             train_loss = avgTrain.compute()
             validation_loss = avgValidation.compute()
-
             # Saving state
             state = (validation_loss, train_loss)
+            if epoch+1 % 10 == 0:
+                model_ft = self.export()
+                torch.save(model_ft, open('file.tar', "wb+"))
             if state < self._kwargs['best']:
                 self._kwargs['best_state'] = state
                 self._kwargs['best_model'] = self.model.state_dict()
-
+        return validation_loss, train_loss
     def _split(self, train_set, **kwargs):
         defaults = {
             'method': 'sequential',

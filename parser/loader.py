@@ -7,10 +7,10 @@ import sys
 import shutil
 import pdb
 import re
-# root = '/home/deepayan/git/san-ocr/data'
-# books = os.listdir(root)
-# subdir = ['Images', 'Annotations', 'Segmentation']
+from tqdm import *
 
+class UnequalLength(BaseException):
+	pass
 def image_prep(image_path):
 	image = cv2.imread(image_path)
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -55,18 +55,24 @@ def images_and_truths(image, plot, text):
 def read_book(**kwargs):
 	pairwise =[]
 	book_path = kwargs["book_path"]
-	dirs = lambda f: book_path + f
+	dirs = lambda f: os.path.join(book_path, f)
 	folder_paths = map(dirs, ['Images/', 'Annotations/', 'Segmentations/'])
 	images, text, plots = list(map(parse_data, folder_paths))
-	for key in images:	
+	keys = [key for key in images.keys()]
+	pbar = tqdm(keys[:25])
+	tsize=[]
+	for key in pbar:	
 		try:
-			print(key)
+			pbar.set_description("Processing %s" % key)
 			unitImages, unitTruths = images_and_truths(images[key], plots[key], text[key])
+			if len(unitImages) != len(unitTruths):
+				raise UnequalLength
 			pairwise.append([unitImages, unitTruths])
-		except Exception as e:
-			print('Key does not exist')
+		except Exception:
+			print('\n Key does not exist')
+			print(key)
+		except UnequalLength:
+			print('\n Unequal lengths')
 			print(key)
 	return pairwise	
 	
-# pairwise = read_book(book_path=os.path.join(root, 'Advaita_Deepika/'))
-# pdb.set_trace()

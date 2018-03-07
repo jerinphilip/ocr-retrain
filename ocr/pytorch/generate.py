@@ -9,7 +9,7 @@ from ocr.pytorch.util import gpu_format
 from parser.lookup import codebook
 from .coding import Decoder
 import pdb
-book = 'Advaita_Deepika/'
+book = 'data/Advaita_Deepika/'
 
 def evaluate(model_ft, sequence, target, decoder):
 	model_ft.eval()
@@ -25,8 +25,6 @@ def evaluateRandomly(book, model_ft, decoder):
 	pagewise = read_book(book_path=book)
 	loader = DataLoader(pagewise=pagewise)
 	sequences, targets = loader.sequences, loader.targets
-	# convert_gpu = lambda x: list(map(gpu_format(lmap), x))
-	# sequences = convert_gpu(sequences)
 	rand = np.arange(len(sequences))
 	np.random.shuffle(rand)
 	for i, n in enumerate(rand):
@@ -37,7 +35,7 @@ def evaluateRandomly(book, model_ft, decoder):
 
 if __name__ == '__main__':
 	savepath = "file.tar"
-	lookup_filename = 'Sanskrit.txt'
+	lookup_filename = 'lookups/Sanskrit.txt'
 	lmap, ilmap = codebook(lookup_filename)
 	kwargs = {}
 	try:

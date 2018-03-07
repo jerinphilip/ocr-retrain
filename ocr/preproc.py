@@ -1,7 +1,7 @@
 from random import shuffle
 from math import floor, ceil
 from collections import namedtuple
-
+import pdb
 class DataLoader:
     def __init__(self, **kwargs):
         self.page_wise = kwargs['pagewise']
@@ -25,7 +25,7 @@ class DataLoader:
         return (super_imgs, super_truths)
         
     def split_data(self, **kwargs):
-        indices = list(range(self.count))
+        indices = list(range(len(self.sequences)))
         if kwargs['random']:
             shuffle(indices) # Works inplace, as per doc.
 

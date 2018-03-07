@@ -1,0 +1,10 @@
+{
+    "model": "models/Sanskrit.tar",
+    "books": [
+        "Advaita_Deepika",
+        "Advaita_Siddhi",
+        "Anubhuti_Prakasha"
+    ],
+    "lookup": "lookups/Sanskrit.txt",
+    "dir": "data/"
+}
