@@ -9,15 +9,15 @@ import pdb
 # Test 1 - Parser
 from parser.loader import read_book
 # book = '/OCRData2/minesh.mathew/Books/books_postcleaning/Malayalam/0002/'
-book = 'Advaita_Deepika/'
+book = 'data/Advaita_Deepika/'
 pagewise = read_book(book_path=book)
 print('finished reading data')
 # Test 2 - DataLoader
 from ocr.preproc import DataLoader 
 print('Reading Data')
-loader = DataLoader(pagewise=pagewise[2:4])
+loader = DataLoader(pagewise=pagewise)
 
-print("Data split:",)
+print("Data split:")
 # print(list(map(len, [loader.split.train, loader.split.val, loader.split.test])))
 
 
@@ -37,20 +37,21 @@ from ocr.util import knot
 # validation = knot(loader.split.test, max_width=width)
 train = loader.split.train
 validation = loader.split.test
+train = [(train[i][0], train[i][1]) for i in range(len(train)) if len(train[i][1])!=0]
+validation = [(validation[i][0], validation[i][1]) for i in range(len(validation)) if len(validation[i][1])!=0]
 print(train[0][1])
 
 # Test-6 - Convert to gpu ready
 from ocr.pytorch.util import gpu_format
 from parser.lookup import codebook
 # lookup_filename = "/OCRData2/ocr/retrain/src/parameters/lookups/Malayalam.txt"
-lookup_filename = 'Sanskrit.txt'
+lookup_filename = 'lookups/Sanskrit.txt'
 lmap, ilmap = codebook(lookup_filename)
-# print(gpu_format(lmap)(train[0]))
-# pdb.set_trace()
 
 # Test-8 - Convert to GPU
 convert_gpu = lambda x: list(map(gpu_format(lmap), x))
 train_set = convert_gpu(train)
+
 #print("Training:")
 #for seq, targ in train_set:
 #    print("Seq Size, Targ size:", seq.size(), targ.size())
@@ -81,5 +82,6 @@ engine = Engine(**kwargs)
 # while not satisfactory:
 print('Training')
 val_err, train_err = engine.train(train_set, debug=True)
+
 kwargs = engine.export()
-torch.save(kwargs, open(savepath, "wb+"))
+# torch.save(kwargs, open(savepath, "wb+"))
