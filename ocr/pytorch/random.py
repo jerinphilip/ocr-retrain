@@ -9,40 +9,37 @@ from ocr.pytorch.util import gpu_format, load
 from parser.lookup import codebook
 from .coding import Decoder
 import pdb
+book = 'data/Advaita_Deepika/'
 
-def evaluate(model_ft, decoder):
-	def get_output(sequence):
-		model_ft.eval()
-		sequence = torch.Tensor(np.array(sequence, dtype=np.float32))
-		sequence = sequence.unsqueeze(0)
-		sequence = sequence.permute(2, 0, 1).contiguous()
-		sequence = sequence.cuda()
-		sequence = Variable(sequence)
-		probs = model_ft(sequence)
-		prediction = decoder.decode(probs)
-		pdb.set_trace()
-		return prediction
-	return get_output
-
-def evaluatePagewise(book, model_ft, decoder):
-	def ocr_out(page):
-		sequences = page[0]
-		f = evaluate(model_ft, decoder)
-		return list(map(f, sequences))
-	def log_out(pno, line):
-		with open('%d.txt'%pno, 'a') as fp:
-			fp.write(line)
+def evaluate(model_ft, sequence, target, decoder):
+	model_ft.eval()
+	sequence = torch.Tensor(np.array(sequence, dtype=np.float32))
+	sequence = sequence.unsqueeze(0)
+	sequence = sequence.permute(2, 0, 1).contiguous()
+	sequence = sequence.cuda()
+	sequence = Variable(sequence)
+	probs = model_ft(sequence)
+	prediction = decoder.decode(probs)
+	return prediction
+def evaluateRandomly(book, model_ft, decoder):
 	pagewise, pno = read_book(book_path=book)
-	predictions = list(map(ocr_out,pagewise[:2]))
-	pdb.set_trace()
-	map(log_out, zip(pno,predictions))
+	loader = DataLoader(pagewise=pagewise)
+	sequences, targets = loader.sequences, loader.targets
+	rand = np.arange(len(sequences))
+	np.random.shuffle(rand)
+	for i, n in enumerate(rand):
+		sequence, target = sequences[n], targets[n]
+		print('Target: %s'%target)
+		output = evaluate(model_ft, sequence, target, decoder)
+		print('Output: %s'%output)
+
 if __name__ == '__main__':
-	savepath = "file_sanskrit.tar"
+	savepath = "file.tar"
 	lmap= load(book='Sanskrit', feat='lookup')
 	if lmap is not None:
 		ilmap = dict(zip(lmap.values(), lmap.keys()))
 	# lookup_filename = 'lookups/Sanskrit.txt'
-	lmap, ilmap = codebook(lookup_filename)
+	# lmap, ilmap = codebook(lookup_filename)
 	kwargs = {}
 	try:
 		with open(savepath, "rb") as savefile:
@@ -57,7 +54,4 @@ if __name__ == '__main__':
 	engine = Engine(**kwargs)
 	decoder  = Decoder(lmap, ilmap)
 	model_ft = engine.model
-	book = 'data/Advaita_Deepika/'
-	evaluatePagewise(book, model_ft, decoder)
-
-
+	evaluateRandomly(book, model_ft, decoder)

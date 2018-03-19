@@ -9,6 +9,11 @@ from tqdm import tqdm
 from random import shuffle
 from math import ceil
 import pdb
+from ocr.pytorch.util import gpu_format, load
+from .coding import Decoder
+from parser.lookup import codebook
+import pandas as pd
+from ocr.util import cer, wer
 class Engine:
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -60,6 +65,22 @@ class Engine:
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
+        if kwargs['validation']:
+            # lmap = load(book='English', feat='lookup')
+            lookup_filename = "lookups/Malayalam.txt"
+            # lookup_filename = 'lookups/Hindi.txt'
+            lmap, ilmap = codebook(lookup_filename)
+            # ilmap = dict(zip(lmap.values(), lmap.keys()))
+            decoder  = Decoder(lmap, ilmap)
+            predict =  decoder.decode(prediction)
+            target = decoder.to_string(target.data)
+            words = predict.split(); truths = target.split()
+            if len(words)!= len(truths):
+                diff = abs(len(truths)-len(words))
+                words = words + diff*['']
+            er_char = cer(words, truths)
+            er_word = wer(words, truths)
+            return loss.data[0], er_char, er_word
         return loss.data[0]
 
 
@@ -70,8 +91,8 @@ class Engine:
         self.model.train()
 
         defaults =  {
-            'max_epochs': 25,
-            'expected_loss': 55.0,
+            'max_epochs': 20,
+            'expected_loss': 35.0,
         }
 
         for key in defaults:
@@ -84,12 +105,13 @@ class Engine:
             f = tqdm
         epoch = 0
         validation_loss = float('inf')
+        loss_log =[]
         while epoch < kwargs['max_epochs'] \
-                and validation_loss > kwargs['expected_loss']:
+            and validation_loss > kwargs['expected_loss']:
 
             epoch = epoch + 1
             print('Epochs:[%d]/[%d]'%(epoch, kwargs['max_epochs']))
-            train_subset, validation_subset = self._split(train_set, method='random')
+            train_subset, validation_subset = self._split(train_set)
 
             # Training
             avgTrain = AverageMeter("train loss")
@@ -100,20 +122,30 @@ class Engine:
             print(avgTrain, flush=True)
             # Validation
             avgValidation = AverageMeter("validation loss")
+            avgChar = AverageMeter("Character Error Rate")
+            avgWord = AverageMeter("Word Error Rate")
             for pair in f(validation_subset):
-                loss = self.train_subroutine(pair, validation=True)
-                avgValidation.add(loss)
+                loss, er_char, er_word = self.train_subroutine(pair, validation=True)
+                avgValidation.add(loss);avgChar.add(er_char); avgWord.add(er_word)
             print(avgValidation, flush=True)
+
             train_loss = avgTrain.compute()
             validation_loss = avgValidation.compute()
+            char_error = avgChar.compute()
+            word_error = avgWord.compute()
             # Saving state
+            print(char_error, word_error)
+            loss_log.append([train_loss, validation_loss, char_error, word_error])
             state = (validation_loss, train_loss)
-            if epoch+1 % 10 == 0:
+            if (epoch+1) % 10 == 0:
+                print('Saved')
                 model_ft = self.export()
                 torch.save(model_ft, open('file.tar', "wb+"))
             if state < self._kwargs['best']:
                 self._kwargs['best_state'] = state
                 self._kwargs['best_model'] = self.model.state_dict()
+        df = pd.DataFrame(loss_log, columns=['Train Loss', 'Validation Loss', 'CER', 'WER'])
+        df.to_csv('loss_log.csv')
         return validation_loss, train_loss
     def _split(self, train_set, **kwargs):
         defaults = {
@@ -145,15 +177,14 @@ class Engine:
 
         avgTest = AverageMeter("test loss")
         for pair in f(test_set):
-            loss = self.train_subroutine(pair, validation=True)
+            loss, er_char, er_word = self.train_subroutine(pair, validation=True)
             avgTest.add(loss)
-
         print(avgTest, flush=True)
 
-
-    def recognize(self, sequence):
+    def recognize(self, sequence, decoder):
         self.model.eval()
         sequence = sequence.cuda()
         sequence = Variable(sequence)
         probs = self.model(sequence)
-        return probs
+        prediction = decoder.decode(probs)
+        return prediction

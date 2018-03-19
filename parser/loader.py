@@ -59,8 +59,8 @@ def read_book(**kwargs):
 	folder_paths = map(dirs, ['Images/', 'Annotations/', 'Segmentations/'])
 	images, text, plots = list(map(parse_data, folder_paths))
 	keys = [key for key in images.keys()]
-	pbar = tqdm(keys[:25])
-	tsize=[]
+	pbar = tqdm(keys[:100])
+	tsize, pno =[], []
 	for key in pbar:	
 		try:
 			pbar.set_description("Processing %s" % key)
@@ -68,11 +68,14 @@ def read_book(**kwargs):
 			if len(unitImages) != len(unitTruths):
 				raise UnequalLength
 			pairwise.append([unitImages, unitTruths])
+			pno.append(key)
 		except Exception:
 			print('\n Key does not exist')
 			print(key)
 		except UnequalLength:
 			print('\n Unequal lengths')
 			print(key)
-	return pairwise	
+	return pairwise, pno	
 	
+# book = 'data/Advaita_Deepika/'
+# pagewise = read_book(book_path=book)

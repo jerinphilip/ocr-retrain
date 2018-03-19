@@ -1,7 +1,7 @@
 from lxml import etree
 from .mapping import line_mapping_f, word_mapping_f
 from .imgproc import extract_units
-
+import pdb
 # Parse line.xml file.
 def parse_ocr_xml(xml_file):
     with open(xml_file, encoding='utf-8') as f:
@@ -27,6 +27,7 @@ def group(text_data, units):
         if pno not in udict["page"]:
             udict["page"][pno] = dict((key, entry[key]) for key in required_keys)
             udict["page"][pno]["units"] = []
+
     for unit in units:
         pno = int(unit["PageNo"])
         udict["page"][pno]["units"].append(unit)
