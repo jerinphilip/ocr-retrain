@@ -68,14 +68,13 @@ def read_book(**kwargs):
 			if len(unitImages) != len(unitTruths):
 				raise UnequalLength
 			pairwise.append([unitImages, unitTruths])
-			pno.append(key)
 		except Exception:
 			print('\n Key does not exist')
 			print(key)
 		except UnequalLength:
 			print('\n Unequal lengths')
 			print(key)
-	return pairwise, pno	
+	return pairwise	
 	
 # book = 'data/Advaita_Deepika/'
 # pagewise = read_book(book_path=book)

@@ -7,6 +7,7 @@ from time import time as _timenow
 from sys import stderr
 import os
 import pickle
+import math
 
 def add_new(lmap, key):
     last = len(lmap.keys())
@@ -26,6 +27,8 @@ def gpu_format(label_map):
         targ = list(map(lambda x: lmap[x] , targ))
         # targ = [label_map[x] if x in label_map else label_map['!'] for x in targ]
         targ = torch.IntTensor(targ)
+        if torch.cuda.is_available():
+            seq = seq.cuda()
         return (seq, targ)
     return ocr_ready
 
@@ -41,7 +44,7 @@ def time(f):
     return _wrapped
 
 def outdir(*names):
-    base_dir = '/data5/deepayan/ocr-retrain/'
+    base_dir = '/data5/deepayan/text-reco/'
     return os.path.join(base_dir, *names)
 def gmkdir(path):
     if not os.path.exists(path):
@@ -63,6 +66,7 @@ def load(**kwargs):
     meta = kwargs['book']
     fname = "%s.%s.pkl"%(meta, kwargs["feat"])
     fpath = os.path.join(base_dir, fname)
+    # print(fpath)
     if os.path.exists(fpath):
         with open(fpath, 'rb') as fp:
             saved = pickle.load(fp)
@@ -177,6 +181,7 @@ class AverageMeter:
         self.min = min(self.min, element)
 
     def compute(self):
+        # pdb.set_trace()
         if self.count == 0:
             return float("inf")
         return self.total/self.count

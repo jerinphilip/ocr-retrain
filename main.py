@@ -23,17 +23,20 @@ class OCRDataset(tud.Dataset):
 		self.books = self.config["books"]
 		self.transform = kwargs['transform']
 		self.vocab = {}
+		print(self.books)
 	def __len__(self):
 		return len(self.books)
 
 	def __getitem__(self, idx):
 		samples = load(book=self.books[idx], feat='feat')
+		# pdb.set_trace()
 		if samples is None:
 			print('No samples found')
-			pagewise, _ = read_book(book_path=os.path.join(self.dir, self.books[idx]))
+			pagewise= read_book(book_path=os.path.join(self.dir, self.books[idx]))
 			loader = DataLoader(pagewise=pagewise)
 			sequences, targets = loader.sequences, loader.targets
 			samples = [(sequences[i], targets[i]) for i in range(len(sequences)) if len(targets[i])!=0]
+
 			if self.transform:
 				samples = self.transform(samples)
 			save(book=self.books[idx], data=samples, feat='feat')
@@ -41,12 +44,12 @@ class OCRDataset(tud.Dataset):
 		
 class ToTensor(object):
 	def __init__(self):
-		self.lmap = load(book='English', feat='lookup')
+		self.lmap = load(book='Sanskrit', feat='gpu_lookup')
 		if self.lmap is None:
 			self.lmap = {}
 	def update_lookup(self,lmap, key):
 		lmap[key] = len(lmap.keys())
-		save(book='English', data=lmap, feat='lookup')
+		save(book='Sanskrit', data=lmap, feat='gpu_lookup')
 		return lmap
 	def gpu_format(self, sample):
 		seq, targ = sample
@@ -58,7 +61,11 @@ class ToTensor(object):
 				print("Updating Dictionary with %s"%t)
 				self.lmap = self.update_lookup(self.lmap, t)
 		targ = [self.lmap[x] for x in targ]
+		# pdb.set_trace()
 		targ = torch.IntTensor(targ)
+		if torch.cuda.is_available():
+			seq = seq.cuda()
+			# targ = seq.cuda()
 		return (seq, targ)
 	def __call__(self, samples):
 		f = lambda x: list(map(self.gpu_format, x))
@@ -66,7 +73,7 @@ class ToTensor(object):
 def train_test(train_set, test_set):
 	savepath = "file_1.tar"
 	kwargs = {}
-	lmap = load(book='English', feat='lookup')
+	lmap = load(book='Sanskrit', feat='gpu_lookup')
 	# pdb.set_trace()
 	if lmap is not None:
 		ilmap = dict(zip(lmap.values(), lmap.keys()))
@@ -84,7 +91,7 @@ def train_test(train_set, test_set):
 		}
 	engine = Engine(**kwargs)
 	print('Training')
-	val_err, train_err = engine.train(train_set[:500], debug=True)
+	val_err, train_err = engine.train(train_set, debug=True)
 	kwargs = engine.export()
 	torch.save(kwargs, open(savepath, "wb+"))
 	# pdb.set_trace()
@@ -103,11 +110,12 @@ if __name__ == '__main__':
 	config_file = open(args.config)
 	config = json.load(config_file)
 	transformed_dataset = OCRDataset(config=config, transform=transforms.Compose([ToTensor()]))
-	total = torch.zeros
+	# total = torch.zeros
 	total = []
 	for i in trange(len(transformed_dataset)):
 		sample = transformed_dataset[i]
 		total+=(sample)
 	train, test = split(total, random=False, split=0.8)
+	# pdb.set_trace()
 	train_test(train, test)
 
